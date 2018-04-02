@@ -31,6 +31,13 @@ const (
 type (
 	// LiveCoin is an interface to LiveCoin rest API.
 	LiveCoin interface {
+		GetTicker(currencyPair string)
+		GetLastTrades(currencyPair, minutesOrHour, tradeType string)
+		GetOrderBook(currencyPair, groupByPrice string, depth int64)
+		GetAllOrderBook(groupByPrice string, depth int64)
+		GetMaxBidMinAsk(currencyPair string)
+		GetRestrictions()
+		GetCoinInfo()
 	}
 
 	liveCoin struct {
@@ -41,7 +48,7 @@ type (
 // NewInstance creates an instance of LiveCoin Callable exchange API.
 func NewInstance() LiveCoin {
 	exchange := new(liveCoin)
-	exchange.Name = "hello"
+	exchange.Name = "LiveCoin"
 	exchange.Enabled = true
 	return exchange
 }

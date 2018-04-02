@@ -8,3 +8,9 @@ type (
 		Enabled bool
 	}
 )
+
+// IsEnabled is a method that returns if the exchange
+// is enabled.
+func (o *Base) IsEnabled() bool {
+	return o.Enabled
+}

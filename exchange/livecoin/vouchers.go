@@ -8,14 +8,12 @@ import (
 func MakeVoucher(amount float64, currency, description string) {
 	path := fmt.Sprintf("%s/payment/voucher/make", liveCoinAPIURL)
 	fmt.Println(path)
-
 }
 
 // CheckVoucherAmount - Returns a voucher amount upon its code.
 func CheckVoucherAmount(voucherCode string) {
 	path := fmt.Sprintf("%s/payment/voucher/amount", liveCoinAPIURL)
 	fmt.Println(path)
-
 }
 
 // RedeemVoucher - Redeem a voucher.
