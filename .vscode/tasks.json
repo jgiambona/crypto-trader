@@ -1,0 +1,50 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "options": {
+    "env": {
+      "GOPATH": "${workspaceRoot}/../../../..",
+    }
+  },
+  "tasks": [
+    {
+      "label": "go: run",
+      "type": "shell",
+      "command": "go run main.go init_*.go",
+      "problemMatcher": [
+        "$go"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "go: run init db",
+      "type": "shell",
+      "options": {
+        "env": {
+
+        }
+      },
+      "command": "go run main.go init_*.go",
+      "problemMatcher": [
+        "$go"
+      ]
+    },
+    {
+      "label": "go: run verbose",
+      "type": "shell",
+      "options": {
+        "env": {
+
+        }
+      },
+      "command": "go run main.go init_*.go",
+      "problemMatcher": [
+        "$go"
+      ]
+    }
+  ]
+}

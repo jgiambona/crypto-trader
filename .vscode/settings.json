@@ -1,0 +1,10 @@
+{
+  "go.gopath": "${workspaceRoot}/../../../..",
+  "editor.tabSize": 2,
+  "files.trimTrailingWhitespace": true,
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/vendor": true,
+  }
+}

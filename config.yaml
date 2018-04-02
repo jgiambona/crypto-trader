@@ -1,0 +1,18 @@
+config:
+  portfolio:
+    addresses:
+      - address: ""
+        type: "ETH"
+        balance: 0.0
+        description: ""
+      - address: ""
+        type: "ETH"
+        balance: 0.0
+        description: ""
+  exchanges:
+    - name: "LiveCoin"
+      rateLimit: 1000,
+      urls:
+        - web: "https://www.livecoin.net"
+          api: "https://api.livecoin.net"
+
