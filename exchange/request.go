@@ -9,7 +9,7 @@ import (
 )
 
 // SendPayload creates a request to be sent to endpoint.
-func SendPayload(method, path string, headers map[string]string, body io.Reader) error {
+func (o *Base) SendPayload(method, path string, headers map[string]string, body io.Reader) error {
 	method = strings.ToUpper(method)
 
 	req, err := http.NewRequest(method, path, body)

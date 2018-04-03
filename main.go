@@ -30,7 +30,8 @@ func main() {
 }
 
 func index(c echo.Context) error {
-	livecoin.GetTicker("")
+	o := livecoin.NewInstance()
+	o.GetTicker("BTC")
 	return c.Render(http.StatusOK, "index.tmpl", nil)
 }
 

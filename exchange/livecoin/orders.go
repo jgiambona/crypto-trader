@@ -7,33 +7,33 @@ import (
 )
 
 // BuyLimit - Open a buy order (limit) for particular currency pair.
-func BuyLimit(params echo.Map) {
+func (e *liveCoin) BuyLimit(params echo.Map) {
 	path := fmt.Sprintf("%s/exchange/selllimit", liveCoinAPIURL)
-	fmt.Println(path)
+	e.SendPayload("GET", path, nil, nil)
 }
 
 // SellLimit - Open a sell order (limit) for a specified currency pair.
-func SellLimit(params echo.Map) {
+func (e *liveCoin) SellLimit(params echo.Map) {
 	path := fmt.Sprintf("%s/exchange/selllimit", liveCoinAPIURL)
-	fmt.Println(path)
+	e.SendPayload("GET", path, nil, nil)
 }
 
 // BuyMarket - Open a buy order (market) of specified amount for
 // particular currency pair.
-func BuyMarket(params echo.Map) {
+func (e *liveCoin) BuyMarket(params echo.Map) {
 	path := fmt.Sprintf("%s/exchange/selllimit", liveCoinAPIURL)
-	fmt.Println(path)
+	e.SendPayload("GET", path, nil, nil)
 }
 
 // SellMarket - Open a sell order (market) for specified amount of
 // selected currency pair.
-func SellMarket(params echo.Map) {
+func (e *liveCoin) SellMarket(params echo.Map) {
 	path := fmt.Sprintf("%s/exchange/selllimit", liveCoinAPIURL)
-	fmt.Println(path)
+	e.SendPayload("GET", path, nil, nil)
 }
 
 // CancelLimit - Cancel order.
-func CancelLimit(params echo.Map) {
+func (e *liveCoin) CancelLimit(params echo.Map) {
 	path := fmt.Sprintf("%s/exchange/selllimit", liveCoinAPIURL)
-	fmt.Println(path)
+	e.SendPayload("GET", path, nil, nil)
 }
