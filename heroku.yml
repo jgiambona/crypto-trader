@@ -3,4 +3,4 @@ build:
     - go
 
 run:
-  web: staging-42
+  web: trader
