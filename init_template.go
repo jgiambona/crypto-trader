@@ -41,7 +41,7 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 }
 
 // LoadTemplates creates a map of all layout and include files.
-func LoadTemplates(e *echo.Echo) *Template {
+func loadTemplates(e *echo.Echo) *Template {
 	templates := make(TemplateMap)
 	templatesDir := "view/templates/"
 

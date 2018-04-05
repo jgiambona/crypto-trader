@@ -1,14 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"sync"
 
-	"github.com/ffimnsr/trader/exchange/livecoin"
 	"github.com/fsnotify/fsnotify"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"golang.org/x/net/websocket"
 )
 
 // Contains forward declaration of API secrets.
@@ -22,21 +23,17 @@ type Bot struct {
 	exchanges []int64
 }
 
-var lc livecoin.LiveCoin
-
 func main() {
 	e := echo.New()
-	e.Renderer = LoadTemplates(e)
+	e.Renderer = loadTemplates(e)
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	//LoadExchanges()
-	//lc.GetTicker("BTC/USD")
+	loadExchanges()
 
 	go templateWatch(e)
-
-	// go PollTicker()
+	go pollTicker()
 
 	e.Static("/public", "public")
 	e.Add("GET", "/", index)
@@ -62,7 +59,7 @@ func templateWatch(e *echo.Echo) {
 				if event.Op&fsnotify.Write == fsnotify.Write {
 					e.Logger.Print("modified file: ", event.Name)
 					mu.Lock()
-					e.Renderer = LoadTemplates(e)
+					e.Renderer = loadTemplates(e)
 					mu.Unlock()
 				}
 			case err := <-watcher.Errors:
@@ -83,22 +80,22 @@ func index(c echo.Context) error {
 }
 
 func socket(c echo.Context) error {
-	// websocket.Handler(func(ws *websocket.Conn) {
-	// 	defer ws.Close()
-	// 	for {
-	// 		err := websocket.Message.Send(ws, "Hello, Client!")
-	// 		if err != nil {
-	// 			c.Logger().Error(err)
-	// 		}
+	websocket.Handler(func(ws *websocket.Conn) {
+		defer ws.Close()
+		for {
+			err := websocket.Message.Send(ws, "Hello, Client!")
+			if err != nil {
+				c.Logger().Error(err)
+			}
 
-	// 		msg := ""
-	// 		err = websocket.Message.Receive(ws, &msg)
-	// 		if err != nil {
-	// 			c.Logger().Error(err)
-	// 		}
+			msg := ""
+			err = websocket.Message.Receive(ws, &msg)
+			if err != nil {
+				c.Logger().Error(err)
+			}
 
-	// 		fmt.Printf("%s\n", msg)
-	// 	}
-	// }).ServeHTTP(c.Response(), c.Request())
+			fmt.Printf("%s\n", msg)
+		}
+	}).ServeHTTP(c.Response(), c.Request())
 	return nil
 }
