@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 	"sync"
 
 	"github.com/ffimnsr/trader/exchange/livecoin"
@@ -40,7 +41,9 @@ func main() {
 	e.Static("/public", "public")
 	e.Add("GET", "/", index)
 	e.Add("GET", "/ws", socket)
-	e.Logger.Fatal(e.Start(":4000"))
+
+	port := os.Getenv("PORT")
+	e.Logger.Fatal(e.Start(":" + port))
 }
 
 func templateWatch(e *echo.Echo) {
