@@ -6,7 +6,7 @@ import (
 
 // GetTicker - Get information on specified currency pair for the last 24 hours.
 func (e *liveCoin) GetTicker(currencyPair string) {
-	path := fmt.Sprintf("%s/exchange/ticker", liveCoinAPIURL)
+	path := fmt.Sprintf("%s/exchange/ticker?currencyPair=%s", liveCoinAPIURL, currencyPair)
 	e.SendPayload("GET", path, nil, nil)
 }
 

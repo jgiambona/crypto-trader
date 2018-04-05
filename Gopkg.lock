@@ -8,6 +8,12 @@
   version = "v3.2.0"
 
 [[projects]]
+  name = "github.com/fsnotify/fsnotify"
+  packages = ["."]
+  revision = "c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9"
+  version = "v1.4.7"
+
+[[projects]]
   name = "github.com/labstack/echo"
   packages = [
     ".",
@@ -66,15 +72,9 @@
   packages = ["unix"]
   revision = "378d26f46672a356c46195c28f61bdb4c0a781dd"
 
-[[projects]]
-  name = "gopkg.in/yaml.v2"
-  packages = ["."]
-  revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
-  version = "v2.2.1"
-
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d66f2cd5b6d30aac02153a10c1ac858a3aa5ec2f17060d07c8438bfaf1c30dcc"
+  inputs-digest = "7344285893d1a2f25d5ae6460dea2cd1c61b657764a65690133c44a540c2f5a6"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -2,33 +2,15 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Crypto Trader</title>
-    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <link rel="stylesheet" href="/public/css/spectre.min.css">
+    <link rel="stylesheet" href="/public/css/trader.css">
   </head>
   <body>
-    <p id="output"></p>
-    <script>
-      let loc = window.location
-      let uri = 'ws:'
-      if (loc.protocol === 'https:') {
-        uri = 'wss:'
-      }
-      uri += '//' + loc.host
-      uri += loc.pathname + 'ws'
-
-      let ws = new WebSocket(uri)
-      ws.onopen = () => {
-        console.log('Connected')
-      }
-
-      ws.onmessage = (e) => {
-        let out = document.getElementById('output')
-        out.innerHTML += e.data + '<br>'
-      }
-
-      setInterval(() => {
-        ws.send('Hello, Server!')
-      }, 1000)
-    </script>
+    {{template "content" .}}
+    <script src="/public/js/require.min.js"></script>
+    <script src="/public/js/trader.js"></script>
   </body>
 </html>
