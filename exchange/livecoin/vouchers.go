@@ -5,19 +5,19 @@ import (
 )
 
 // MakeVoucher - Creates a new voucher.
-func (e *liveCoin) MakeVoucher(amount float64, currency, description string) {
-	path := fmt.Sprintf("%s/payment/voucher/make", liveCoinAPIURL)
+func (e *LiveCoin) MakeVoucher(amount float64, currency, description string) {
+	path := fmt.Sprintf("%s/payment/voucher/make", LiveCoinAPIURL)
 	e.SendPayload("GET", path, nil, nil)
 }
 
 // CheckVoucherAmount - Returns a voucher amount upon its code.
-func (e *liveCoin) CheckVoucherAmount(voucherCode string) {
-	path := fmt.Sprintf("%s/payment/voucher/amount", liveCoinAPIURL)
+func (e *LiveCoin) CheckVoucherAmount(voucherCode string) {
+	path := fmt.Sprintf("%s/payment/voucher/amount", LiveCoinAPIURL)
 	e.SendPayload("GET", path, nil, nil)
 }
 
 // RedeemVoucher - Redeem a voucher.
-func (e *liveCoin) RedeemVoucher(voucherCode string) {
-	path := fmt.Sprintf("%s/payment/voucher/redeem", liveCoinAPIURL)
+func (e *LiveCoin) RedeemVoucher(voucherCode string) {
+	path := fmt.Sprintf("%s/payment/voucher/redeem", LiveCoinAPIURL)
 	e.SendPayload("GET", path, nil, nil)
 }

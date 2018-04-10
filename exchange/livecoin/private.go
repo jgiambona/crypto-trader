@@ -8,64 +8,64 @@ import (
 
 // GetTrades - Get information on your latest transactions. The return may be
 // limited by the parameters below.
-func (e *liveCoin) GetTrades() {
-	path := fmt.Sprintf("%s/exchange/trades", liveCoinAPIURL)
+func (e *LiveCoin) GetTrades() {
+	path := fmt.Sprintf("%s/exchange/trades", LiveCoinAPIURL)
 	e.SendPayload("GET", path, nil, nil)
 }
 
 // GetClientOrders - Get a detailed review of your orders for requested currency
 // pair. You can optionally limit return of orders of a certain type (return
 // only open or only closed orders).
-func (e *liveCoin) GetClientOrders(params echo.Map) {
-	path := fmt.Sprintf("%s/exchange/client_orders", liveCoinAPIURL)
+func (e *LiveCoin) GetClientOrders(params echo.Map) {
+	path := fmt.Sprintf("%s/exchange/client_orders", LiveCoinAPIURL)
 	e.SendPayload("GET", path, nil, nil)
 
 }
 
 // GetOrder - Get the order information by its ID.
-func (e *liveCoin) GetOrder(params echo.Map) {
-	path := fmt.Sprintf("%s/exchange/order", liveCoinAPIURL)
+func (e *LiveCoin) GetOrder(params echo.Map) {
+	path := fmt.Sprintf("%s/exchange/order", LiveCoinAPIURL)
 	e.SendPayload("GET", path, nil, nil)
 }
 
 // GetBalances - Returns an array of your balances. There are four types of
 // balances for every currency: totaltotal, funds available for trading,
 // funds in open orders , funds available for withdrawal.
-func (e *liveCoin) GetBalances(currency string) {
-	path := fmt.Sprintf("%s/payment/balances", liveCoinAPIURL)
+func (e *LiveCoin) GetBalances(currency string) {
+	path := fmt.Sprintf("%s/payment/balances", LiveCoinAPIURL)
 	e.SendPayload("GET", path, nil, nil)
 }
 
 // GetBalance - Returns available balance for selected currency.
-func (e *liveCoin) GetBalance(currency string) {
-	path := fmt.Sprintf("%s/payment/balance", liveCoinAPIURL)
+func (e *LiveCoin) GetBalance(currency string) {
+	path := fmt.Sprintf("%s/payment/balance", LiveCoinAPIURL)
 	e.SendPayload("GET", path, nil, nil)
 }
 
 // GetHistoryTransactions - Returns a list of your transactions.
-func (e *liveCoin) GetHistoryTransactions(params echo.Map) {
-	path := fmt.Sprintf("%s/payment/history/transactions", liveCoinAPIURL)
+func (e *LiveCoin) GetHistoryTransactions(params echo.Map) {
+	path := fmt.Sprintf("%s/payment/history/transactions", LiveCoinAPIURL)
 	e.SendPayload("GET", path, nil, nil)
 }
 
 // GetHistorySize - Returns the number of transactions with pre-defined
 // parameters.
-func (e *liveCoin) GetHistorySize(params echo.Map) {
-	path := fmt.Sprintf("%s/payment/history/size", liveCoinAPIURL)
+func (e *LiveCoin) GetHistorySize(params echo.Map) {
+	path := fmt.Sprintf("%s/payment/history/size", LiveCoinAPIURL)
 	e.SendPayload("GET", path, nil, nil)
 }
 
 // GetCommission - Returns actual trading fee for customer.
-func (e *liveCoin) GetCommission(params echo.Map) {
-	path := fmt.Sprintf("%s/exchange/commission", liveCoinAPIURL)
+func (e *LiveCoin) GetCommission(params echo.Map) {
+	path := fmt.Sprintf("%s/exchange/commission", LiveCoinAPIURL)
 	e.SendPayload("GET", path, nil, nil)
 
 }
 
 // GetCommissionCommonInfo - Returns actual trading fee and volume for the
 // last 30 days in USD.
-func (e *liveCoin) GetCommissionCommonInfo(params echo.Map) {
-	path := fmt.Sprintf("%s/exchange/commissionCommonInfo", liveCoinAPIURL)
+func (e *LiveCoin) GetCommissionCommonInfo(params echo.Map) {
+	path := fmt.Sprintf("%s/exchange/commissionCommonInfo", LiveCoinAPIURL)
 	e.SendPayload("GET", path, nil, nil)
 
 }

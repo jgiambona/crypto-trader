@@ -5,7 +5,9 @@ import (
 	"io"
 	"net/http"
 	"path/filepath"
+	"sync"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/labstack/echo"
 	"github.com/valyala/bytebufferpool"
 )
@@ -65,4 +67,36 @@ func loadTemplates(e *echo.Echo) *Template {
 		templates,
 	}
 	return t
+}
+
+func templateWatch(e *echo.Echo) {
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		e.Logger.Fatal(err)
+	}
+	defer watcher.Close()
+
+	mu := &sync.Mutex{}
+	done := make(chan bool)
+	go func() {
+		for {
+			select {
+			case event := <-watcher.Events:
+				if event.Op&fsnotify.Write == fsnotify.Write {
+					e.Logger.Print("modified file: ", event.Name)
+					mu.Lock()
+					e.Renderer = loadTemplates(e)
+					mu.Unlock()
+				}
+			case err := <-watcher.Errors:
+				e.Logger.Fatal(err)
+			}
+		}
+	}()
+
+	err = watcher.Add("view/templates/index.tmpl")
+	if err != nil {
+		e.Logger.Fatal(err)
+	}
+	<-done
 }

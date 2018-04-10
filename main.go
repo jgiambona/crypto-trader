@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"sync"
 
-	"github.com/fsnotify/fsnotify"
+	"github.com/ffimnsr/trader/exchange"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"golang.org/x/net/websocket"
@@ -14,14 +13,17 @@ import (
 
 // Contains forward declaration of API secrets.
 const (
-	APIKey       = "gZaXWxSudtwt1AR3cW6Fdh5UY3BgVG4r"
-	APISecretKey = "FYw6X3gzcJ4F5JvqmYBqAMwdMexzAay7"
+	APIKey    = "gZaXWxSudtwt1AR3cW6Fdh5UY3BgVG4r"
+	APISecret = "FYw6X3gzcJ4F5JvqmYBqAMwdMexzAay7"
 )
 
 // Bot is the singleton that holds all the data.
 type Bot struct {
-	exchanges []int64
+	config    *BotConfig
+	exchanges []exchange.BotExchange
 }
+
+var bot Bot
 
 func main() {
 	e := echo.New()
@@ -30,49 +32,26 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
+	loadConfig()
 	loadExchanges()
+	if len(bot.exchanges) == 0 {
+		e.Logger.Fatal("No exchanges were loaded.")
+	}
 
 	go templateWatch(e)
 	go pollTicker()
 
 	e.Static("/public", "public")
 	e.Add("GET", "/", index)
+	e.Add("GET", "/bot/restart", index)
+	e.Add("GET", "/bot/suspend", index)
 	e.Add("GET", "/ws", socket)
 
-	port := os.Getenv("PORT")
-	e.Logger.Fatal(e.Start(":" + port))
-}
-
-func templateWatch(e *echo.Echo) {
-	watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		e.Logger.Fatal(err)
+	if port, ok := os.LookupEnv("PORT"); ok {
+		e.Logger.Fatal(e.Start(":" + port))
+	} else {
+		e.Logger.Fatal(e.Start(":8000"))
 	}
-	defer watcher.Close()
-
-	mu := &sync.Mutex{}
-	done := make(chan bool)
-	go func() {
-		for {
-			select {
-			case event := <-watcher.Events:
-				if event.Op&fsnotify.Write == fsnotify.Write {
-					e.Logger.Print("modified file: ", event.Name)
-					mu.Lock()
-					e.Renderer = loadTemplates(e)
-					mu.Unlock()
-				}
-			case err := <-watcher.Errors:
-				e.Logger.Fatal(err)
-			}
-		}
-	}()
-
-	err = watcher.Add("view/templates/index.tmpl")
-	if err != nil {
-		e.Logger.Fatal(err)
-	}
-	<-done
 }
 
 func index(c echo.Context) error {

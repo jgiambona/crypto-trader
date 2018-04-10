@@ -68,13 +68,25 @@
 
 [[projects]]
   branch = "master"
+  name = "golang.org/x/net"
+  packages = ["websocket"]
+  revision = "61147c48b25b599e5b561d2e9c4f3e1ef489ca41"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
   revision = "378d26f46672a356c46195c28f61bdb4c0a781dd"
 
+[[projects]]
+  name = "gopkg.in/yaml.v2"
+  packages = ["."]
+  revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
+  version = "v2.2.1"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7344285893d1a2f25d5ae6460dea2cd1c61b657764a65690133c44a540c2f5a6"
+  inputs-digest = "2005744286056a6ae27ad9c5bb699e89bb74fb22d6f296c9f47511e8f1f2bc1f"
   solver-name = "gps-cdcl"
   solver-version = 1

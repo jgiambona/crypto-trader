@@ -6,7 +6,7 @@ import (
 
 // Base API URL.
 const (
-	liveCoinAPIURL = "https://api.livecoin.net"
+	LiveCoinAPIURL = "https://api.livecoin.net"
 )
 
 // The API error codes that are being returned.
@@ -29,26 +29,8 @@ const (
 )
 
 type (
-	// LiveCoin is an interface to LiveCoin rest API.
-	LiveCoin interface {
-		GetTicker(currencyPair string)
-		GetLastTrades(currencyPair, minutesOrHour, tradeType string)
-		GetOrderBook(currencyPair, groupByPrice string, depth int64)
-		GetAllOrderBook(groupByPrice string, depth int64)
-		GetMaxBidMinAsk(currencyPair string)
-		GetRestrictions()
-		GetCoinInfo()
-	}
-
-	liveCoin struct {
+	// LiveCoin interfaces the LiveCoin Rest API.
+	LiveCoin struct {
 		exchange.Base
 	}
 )
-
-// NewInstance creates an instance of LiveCoin Callable exchange API.
-func NewInstance() LiveCoin {
-	exchange := new(liveCoin)
-	exchange.Name = "LiveCoin"
-	exchange.Enabled = true
-	return exchange
-}
