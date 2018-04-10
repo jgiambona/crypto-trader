@@ -7,7 +7,7 @@ import (
 // MakeVoucher - Creates a new voucher.
 func (e *LiveCoin) MakeVoucher(amount float64, currency, description string) {
 	path := fmt.Sprintf("%s/payment/voucher/make", LiveCoinAPIURL)
-	e.SendPayload("GET", path, nil, nil)
+	e.SendPayload("POST", path, nil, nil)
 }
 
 // CheckVoucherAmount - Returns a voucher amount upon its code.

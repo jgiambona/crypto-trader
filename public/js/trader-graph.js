@@ -6,7 +6,7 @@ define([
 ], (d3) => {
     let p = document.getElementById('graph')
     let margin = { top: 20, right: 20, bottom: 30, left: 30 },
-      cw = p.clientWidth - 40,
+      cw = p.clientWidth - 30,
       ch = 500,
       width = cw - margin.left - margin.right,
       height = ch - margin.top - margin.bottom,

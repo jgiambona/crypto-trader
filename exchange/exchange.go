@@ -18,23 +18,16 @@ type (
 
 	// BotExchange TODO
 	BotExchange interface {
+		GetName() string
 		IsEnabled() bool
 		// GetTickerPrice()
-		// UpdateTicker()
+		UpdateTicker()
 	}
 )
 
-// NewExchange TODO
-func NewExchange(name string, apiURL, apiKey, apiSecret string,
-	pollingDelay time.Duration, enabled bool) BotExchange {
-	return &Base{
-		Name:         name,
-		APIBaseURL:   apiURL,
-		APIKey:       apiKey,
-		APISecret:    apiSecret,
-		PollingDelay: pollingDelay,
-		Enabled:      enabled,
-	}
+// GetName returns the name of the exchange.
+func (o *Base) GetName() string {
+	return o.Name
 }
 
 // IsEnabled is a method that returns if the exchange

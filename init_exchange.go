@@ -25,7 +25,7 @@ func initializeExchange(name string) error {
 	switch strings.ToLower(name) {
 	case "livecoin":
 		log.Printf("--- [active] LiveCoin")
-		exch = new(livecoin.LiveCoin)
+		exch = livecoin.NewInstance()
 	default:
 		return errors.New("exchange not found")
 	}
