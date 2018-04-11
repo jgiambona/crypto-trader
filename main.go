@@ -13,9 +13,40 @@ import (
 
 // Contains forward declaration of API secrets.
 const (
-	APIKey    = "gZaXWxSudtwt1AR3cW6Fdh5UY3BgVG4r"
-	APISecret = "FYw6X3gzcJ4F5JvqmYBqAMwdMexzAay7"
+	apiKey    = "gZaXWxSudtwt1AR3cW6Fdh5UY3BgVG4r"
+	apiSecret = "FYw6X3gzcJ4F5JvqmYBqAMwdMexzAay7"
 )
+
+var strategies = map[string]string{
+	"uptrend":      "Uptrend",
+	"bb":           "Bollinger Bands",
+	"gain":         "Gain",
+	"pp":           "Pingpong",
+	"stepgain":     "Stepgain",
+	"tssl":         "Trailing Stop / Stop Limit",
+	"emotionless":  "Emotionless",
+	"ichimoku":     "Ichimoku",
+	"tsslbb":       "Trailing Stop / Stop Limit - Bollinger Bands",
+	"tsslpp":       "Trailing Stop / Stop Limit - Pingpong",
+	"tsslstepgain": "Trailing Stop / Stop Limit - Stepgain",
+	"tsslgain":     "Trailing Stop / Stop Limit - Gain",
+	"bbrsitssl":    "Bollinger Bands + RSI - Trailing Stop / Stop Limit",
+	"pptssl":       "Pingpong - Trailing Stop / Stop Limit",
+	"stepgaintssl": "Stepgain - Trailing Stop / Stop Limit",
+	"gaintssl":     "Gain - Trailing Stop / Stop Limit",
+	"bbtssl":       "Bollinger Bands - Trailing Stop / Stop Limit",
+	"bbgain":       "Bollinger Bands - Gain",
+	"gainbb":       "Gain - Bollinger Bands",
+	"bbstepgain":   "Bollinger Bands - Stepgain",
+	"stepgainbb":   "Stepgain - Bollinger Bands",
+	"bbpp":         "Bollinger Bands - Pingpong",
+	"ppbb":         "Pingpong - Bollinger Bands",
+	"gainstepgain": "Gain - Stepgain",
+	"stepgaingain": "Stepgain - Gain",
+	"gainpp":       "Gain - Pingpong",
+	"stepgainpp":   "Stepgain - Pingpong",
+	"ppstepgain":   "Pingpong - Stepgain",
+}
 
 // Bot is the singleton that holds all the data.
 type Bot struct {
@@ -35,8 +66,17 @@ func main() {
 	loadConfig()
 	loadExchanges()
 	if len(bot.exchanges) == 0 {
-		e.Logger.Fatal("No exchanges were loaded.")
+		e.Logger.Fatal("no exchanges were loaded.")
 	}
+
+	//c, err := influx.NewHTTPClient(influx.HTTPConfig{
+	//	Addr: "http://localhost:8086",
+	//})
+	//if err != nil {
+	//	e.Logger.Fatal(err)
+	//}
+
+	//influx.
 
 	go templateWatch(e)
 	go pollTicker()
@@ -55,7 +95,10 @@ func main() {
 }
 
 func index(c echo.Context) error {
-	return c.Render(http.StatusOK, "index.tmpl", nil)
+	context := map[string]interface{}{
+		"strategies": strategies,
+	}
+	return c.Render(http.StatusOK, "index.tmpl", context)
 }
 
 func socket(c echo.Context) error {

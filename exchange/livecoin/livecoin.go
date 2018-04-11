@@ -1,7 +1,11 @@
 package livecoin
 
 import (
+	"log"
+	"time"
+
 	"github.com/ffimnsr/trader/exchange"
+	influx "github.com/influxdata/influxdb/client/v2"
 )
 
 // Base API URL.
@@ -38,7 +42,23 @@ const (
 type (
 	// LiveCoin interfaces the LiveCoin Rest API.
 	LiveCoin struct {
+		Store influx.Client
 		exchange.Base
+	}
+
+	// Price stores the pricing information.
+	Price struct {
+		Currency     string  `json:"cur"`
+		CurrencyPair string  `json:"symbol"`
+		Last         float64 `json:"last"`
+		High         float64 `json:"high"`
+		Low          float64 `json:"low"`
+		Volume       float64 `json:"volume"`
+		Vwap         float64 `json:"vwap"`
+		MaxBid       float64 `json:"max_bid"`
+		MinAsk       float64 `json:"min_ask"`
+		BestBid      float64 `json:"best_bid"`
+		BestAsk      float64 `json:"best_ask"`
 	}
 )
 
@@ -47,10 +67,41 @@ func NewInstance() *LiveCoin {
 	x := new(LiveCoin)
 	x.Name = "LiveCoin"
 	x.Enabled = true
+	x.Store, _ = influx.NewHTTPClient(influx.HTTPConfig{
+		Addr: "http://localhost:8086",
+	})
 	return x
 }
 
 // UpdateTicker updates and returns ticker for a currency pair.
 func (e *LiveCoin) UpdateTicker() {
-	e.GetTicker("BTC/USD")
+	p := e.GetTicker("BTC/USD")
+
+	bp, err := influx.NewBatchPoints(influx.BatchPointsConfig{
+		Database:  "trader",
+		Precision: "s",
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	tags := map[string]string{
+		"type":     "ticker",
+		"pair":     "btc_usd",
+		"exchange": "livecoin",
+	}
+	log.Printf("%f", p.Last)
+	fields := map[string]interface{}{
+		"last":   p.Last,
+		"high":   p.High,
+		"low":    p.Low,
+		"volume": p.Volume,
+	}
+
+	pt, err := influx.NewPoint("stream", tags, fields, time.Now())
+	bp.AddPoint(pt)
+	err = e.Store.Write(bp)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

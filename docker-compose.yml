@@ -1,5 +1,16 @@
 version: '3.5'
 services:
-  web:
+  influxdb:
+    image: influxdb:1.5-alpine
+    environment:
+      INFLUXDB: trader
     ports:
-      - "4000:4000"
+      - "8086:8086"
+    volumes:
+      - "$PWD/var/lib/influxdb:/var/lib/influxdb"
+  grafana:
+    image: grafana/grafana:5.0.4
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: trader
+    ports:
+      - "3000:3000"

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"sync"
 	"time"
 
@@ -15,10 +14,10 @@ func pollTicker() {
 	for {
 		waitExchanges.Add(len(bot.exchanges))
 		for _, x := range bot.exchanges {
-			log.Printf("check updated prices")
-			log.Printf("calculate sell price")
-			log.Printf("calculate profit")
-			log.Printf("check if selling price is gt sell worth then begin selling")
+			//log.Printf("check updated prices")
+			//log.Printf("calculate sell price")
+			//log.Printf("calculate profit")
+			//log.Printf("check if selling price is gt sell worth then begin selling")
 
 			go func(c exchange.BotExchange) {
 				defer waitExchanges.Done()

@@ -4,16 +4,16 @@ requirejs.config({
   baseUrl: '/public/js',
   paths: {
     moment: 'moment.min',
-    d3: 'd3.min',
     dr: 'dom-ready'
   },
 })
 
-requirejs(['moment', 'd3'])
+requirejs(['moment'])
 requirejs([
-  'd3',
-  'trader-graph',
-  'trader-socket'
-], (d3) => {
-  console.log(`Successfully loaded D3 version ${d3.version}`)
+], () => {
+  window.setInterval(() => {
+    console.log("reload frames")
+    document.frames["price-graph"].location.reload()
+    document.frames["win-loss-graph"].location.reload()
+  }, 3000)
 })

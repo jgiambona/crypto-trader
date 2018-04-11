@@ -7,5 +7,6 @@
     "**/.git": true,
     "**/.DS_Store": true,
     "**/vendor": true,
+    "**/var": true,
   }
 }

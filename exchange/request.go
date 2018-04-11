@@ -1,6 +1,7 @@
 package exchange
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -9,7 +10,7 @@ import (
 )
 
 // SendPayload creates a request to be sent to endpoint.
-func (o *Base) SendPayload(method, path string, headers map[string]string, body io.Reader) error {
+func (o *Base) SendPayload(method, path string, headers map[string]string, body io.Reader, result interface{}) error {
 	method = strings.ToUpper(method)
 
 	req, err := http.NewRequest(method, path, body)
@@ -31,6 +32,8 @@ func (o *Base) SendPayload(method, path string, headers map[string]string, body 
 	if err != nil {
 		return err
 	}
+
 	fmt.Println("response contents:", string(contents))
-	return nil
+	err = json.Unmarshal(contents, &result)
+	return err
 }
