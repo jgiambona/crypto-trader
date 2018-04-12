@@ -68,7 +68,7 @@ func NewInstance() *LiveCoin {
 	x.Name = "LiveCoin"
 	x.Enabled = true
 	x.Store, _ = influx.NewHTTPClient(influx.HTTPConfig{
-		Addr: "http://localhost:8086",
+		Addr: "http://ec2-54-169-102-171.ap-southeast-1.compute.amazonaws.com:8086",
 	})
 	return x
 }
@@ -82,7 +82,7 @@ func (e *LiveCoin) UpdateTicker() {
 		Precision: "s",
 	})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("%s", err.Error())
 	}
 
 	tags := map[string]string{
@@ -92,16 +92,20 @@ func (e *LiveCoin) UpdateTicker() {
 	}
 	log.Printf("%f", p.Last)
 	fields := map[string]interface{}{
-		"last":   p.Last,
-		"high":   p.High,
-		"low":    p.Low,
-		"volume": p.Volume,
+		"last":     p.Last,
+		"high":     p.High,
+		"low":      p.Low,
+		"volume":   p.Volume,
+		"min_ask":  p.MinAsk,
+		"max_bid":  p.MaxBid,
+		"best_ask": p.BestAsk,
+		"best_bid": p.BestBid,
 	}
 
 	pt, err := influx.NewPoint("stream", tags, fields, time.Now())
 	bp.AddPoint(pt)
 	err = e.Store.Write(bp)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("%s", err.Error())
 	}
 }

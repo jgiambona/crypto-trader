@@ -21,7 +21,9 @@ func (e *LiveCoin) GetTicker(currencyPair string) Price {
 // for the last minute.
 func (e *LiveCoin) GetLastTrades(currencyPair, minutesOrHour, tradeType string) {
 	path := fmt.Sprintf("%s/exchange/last_trades", LiveCoinAPIURL)
-	e.SendPayload("GET", path, nil, nil, nil)
+	if err := e.SendPayload("GET", path, nil, nil, nil); err != nil {
+		log.Fatalf("%s", err.Error())
+	}
 }
 
 // GetOrderBook - Get the orderbook for specified currency pair (you may

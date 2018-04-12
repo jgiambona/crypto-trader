@@ -8,10 +8,20 @@
   version = "v3.2.0"
 
 [[projects]]
-  name = "github.com/fsnotify/fsnotify"
+  name = "github.com/gorilla/websocket"
   packages = ["."]
-  revision = "c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9"
-  version = "v1.4.7"
+  revision = "ea4d1f681babbce9545c9c5f3d5194a789c89f5b"
+  version = "v1.2.0"
+
+[[projects]]
+  name = "github.com/influxdata/influxdb"
+  packages = [
+    "client/v2",
+    "models",
+    "pkg/escape"
+  ]
+  revision = "cdae4ccde4c67c3390d8ae8a1a06bd3b4cdce5c5"
+  version = "v1.5.1"
 
 [[projects]]
   name = "github.com/labstack/echo"
@@ -68,12 +78,6 @@
 
 [[projects]]
   branch = "master"
-  name = "golang.org/x/net"
-  packages = ["websocket"]
-  revision = "61147c48b25b599e5b561d2e9c4f3e1ef489ca41"
-
-[[projects]]
-  branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
   revision = "378d26f46672a356c46195c28f61bdb4c0a781dd"
@@ -87,6 +91,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2005744286056a6ae27ad9c5bb699e89bb74fb22d6f296c9f47511e8f1f2bc1f"
+  inputs-digest = "c8c0338058622eb3d69f52f107a387aabe792aef5f375ba4d4ce69f1fc1ed5f8"
   solver-name = "gps-cdcl"
   solver-version = 1

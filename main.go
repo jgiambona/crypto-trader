@@ -1,20 +1,14 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/ffimnsr/trader/exchange"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"golang.org/x/net/websocket"
-)
-
-// Contains forward declaration of API secrets.
-const (
-	apiKey    = "gZaXWxSudtwt1AR3cW6Fdh5UY3BgVG4r"
-	apiSecret = "FYw6X3gzcJ4F5JvqmYBqAMwdMexzAay7"
 )
 
 var strategies = map[string]string{
@@ -58,7 +52,6 @@ var bot Bot
 
 func main() {
 	e := echo.New()
-	e.Renderer = loadTemplates(e)
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
@@ -69,23 +62,16 @@ func main() {
 		e.Logger.Fatal("no exchanges were loaded.")
 	}
 
-	//c, err := influx.NewHTTPClient(influx.HTTPConfig{
-	//	Addr: "http://localhost:8086",
-	//})
-	//if err != nil {
-	//	e.Logger.Fatal(err)
-	//}
-
-	//influx.
-
-	go templateWatch(e)
+	go socketCheckBalance()
 	go pollTicker()
 
-	e.Static("/public", "public")
 	e.Add("GET", "/", index)
-	e.Add("GET", "/bot/restart", index)
-	e.Add("GET", "/bot/suspend", index)
+	e.Add("GET", "/bot/:name/info", getExchangeConfigInfo)
+	e.Add("GET", "/bot/restart", restart)
+	e.Add("GET", "/bot/suspend", suspend)
 	e.Add("GET", "/ws", socket)
+
+	e.Add("POST", "/bot/setup", index)
 
 	if port, ok := os.LookupEnv("PORT"); ok {
 		e.Logger.Fatal(e.Start(":" + port))
@@ -95,29 +81,57 @@ func main() {
 }
 
 func index(c echo.Context) error {
-	context := map[string]interface{}{
-		"strategies": strategies,
+	return c.NoContent(http.StatusOK)
+}
+
+func restart(c echo.Context) error {
+	return c.NoContent(http.StatusOK)
+}
+
+func suspend(c echo.Context) error {
+	return c.NoContent(http.StatusOK)
+}
+
+func getExchangeConfigInfo(c echo.Context) error {
+	flag := -1
+	for i, x := range bot.config.Exchanges {
+		param := c.Param("name")
+		log.Print(param)
+		if len(param) > 0 && param == strings.ToLower(x.Name) {
+			flag = i
+		}
 	}
-	return c.Render(http.StatusOK, "index.tmpl", context)
+
+	if flag < 0 {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"success": false,
+			"message": "exchange is not been set",
+		})
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{
+		"success": true,
+		"config":  bot.config.Exchanges[flag],
+	})
 }
 
 func socket(c echo.Context) error {
-	websocket.Handler(func(ws *websocket.Conn) {
-		defer ws.Close()
-		for {
-			err := websocket.Message.Send(ws, "Hello, Client!")
-			if err != nil {
-				c.Logger().Error(err)
-			}
+	//websocket.Handler(func(ws *websocket.Conn) {
+	//	defer ws.Close()
+	//	for {
+	//		err := websocket.Message.Send(ws, "Hello, Client!")
+	//		if err != nil {
+	//			c.Logger().Error(err)
+	//		}
 
-			msg := ""
-			err = websocket.Message.Receive(ws, &msg)
-			if err != nil {
-				c.Logger().Error(err)
-			}
+	//		msg := ""
+	//		err = websocket.Message.Receive(ws, &msg)
+	//		if err != nil {
+	//			c.Logger().Error(err)
+	//		}
 
-			fmt.Printf("%s\n", msg)
-		}
-	}).ServeHTTP(c.Response(), c.Request())
+	//		fmt.Printf("%s\n", msg)
+	//	}
+	//}).ServeHTTP(c.Response(), c.Request())
 	return nil
 }

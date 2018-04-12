@@ -3,7 +3,7 @@ services:
   influxdb:
     image: influxdb:1.5-alpine
     environment:
-      INFLUXDB: trader
+      - INFLUXDB=trader
     ports:
       - "8086:8086"
     volumes:
@@ -11,6 +11,10 @@ services:
   grafana:
     image: grafana/grafana:5.0.4
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: trader
+      - GF_SECURITY_ADMIN_PASSWORD=trader
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_NAME=Anonymous
     ports:
       - "3000:3000"
+    volumes:
+      - "$PWD/var/lib/grafana:/var/lib/grafana"

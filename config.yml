@@ -1,14 +1,12 @@
 portfolio:
   addresses:
     - address:
-      type: ETH
-      balance: 0.0
-      description:
+      type: BTC
 exchanges:
   - name: LiveCoin
     rateLimit: 1000
     urls:
-      - web: "https://www.livecoin.net"
-        api: "https://api.livecoin.net"
+      web: "https://www.livecoin.net"
+      api: "https://api.livecoin.net"
     apiKey: YRGYqShTBGqxFGH4tkgXd9ycjUTYdN5N
     apiSecret: hC2HQjXjExjpfFEJE6am98TvbpDkjRfQ
