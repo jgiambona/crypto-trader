@@ -46,8 +46,8 @@ type (
 		exchange.Base
 	}
 
-	// Price stores the pricing information.
-	Price struct {
+	// Ticker stores the pricing information.
+	Ticker struct {
 		Currency     string  `json:"cur"`
 		CurrencyPair string  `json:"symbol"`
 		Last         float64 `json:"last"`
@@ -73,16 +73,27 @@ func NewInstance() *LiveCoin {
 	return x
 }
 
+// GetFee returns the current fee for the exchange.
+func (e *LiveCoin) GetFee(maker bool) float64 {
+	if maker {
+		return 0.0
+	}
+	return 0.0
+}
+
 // UpdateTicker updates and returns ticker for a currency pair.
 func (e *LiveCoin) UpdateTicker() {
-	p := e.GetTicker("BTC/USD")
+	p, err := e.GetTicker("BTC/USD")
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
 	bp, err := influx.NewBatchPoints(influx.BatchPointsConfig{
 		Database:  "trader",
 		Precision: "s",
 	})
 	if err != nil {
-		log.Fatalf("%s", err.Error())
+		log.Fatal(err.Error())
 	}
 
 	tags := map[string]string{
@@ -90,7 +101,6 @@ func (e *LiveCoin) UpdateTicker() {
 		"pair":     "btc_usd",
 		"exchange": "livecoin",
 	}
-	log.Printf("%f", p.Last)
 	fields := map[string]interface{}{
 		"last":     p.Last,
 		"high":     p.High,

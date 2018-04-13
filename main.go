@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/ffimnsr/trader/exchange"
+	influx "github.com/influxdata/influxdb/client/v2"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
@@ -46,6 +47,7 @@ var strategies = map[string]string{
 type Bot struct {
 	config    *BotConfig
 	exchanges []exchange.BotExchange
+	store     influx.Client
 }
 
 var bot Bot
@@ -55,6 +57,14 @@ func main() {
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+
+	var err error
+	bot.store, err = influx.NewHTTPClient(influx.HTTPConfig{
+		Addr: "http://ec2-54-169-102-171.ap-southeast-1.compute.amazonaws.com:8086",
+	})
+	if err != nil {
+		e.Logger.Fatal("unable to connect to db.")
+	}
 
 	loadConfig()
 	loadExchanges()

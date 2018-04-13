@@ -20,7 +20,6 @@ type (
 	BotExchange interface {
 		GetName() string
 		IsEnabled() bool
-		// GetTickerPrice()
 		UpdateTicker()
 	}
 )

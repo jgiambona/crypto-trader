@@ -6,14 +6,10 @@ import (
 )
 
 // GetTicker - Get information on specified currency pair for the last 24 hours.
-func (e *LiveCoin) GetTicker(currencyPair string) Price {
+func (e *LiveCoin) GetTicker(currencyPair string) (Ticker, error) {
+	result := Ticker{}
 	path := fmt.Sprintf("%s/exchange/ticker?currencyPair=%s", LiveCoinAPIURL, currencyPair)
-
-	result := Price{}
-	if err := e.SendPayload("GET", path, nil, nil, &result); err != nil {
-		log.Fatalf("%s", err.Error())
-	}
-	return result
+	return result, e.SendPayload("GET", path, nil, nil, &result)
 }
 
 // GetLastTrades - Get a detailed review on the latest transactions for
