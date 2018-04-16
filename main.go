@@ -43,11 +43,24 @@ var strategies = map[string]string{
 	"ppstepgain":   "Pingpong - Stepgain",
 }
 
+// SessionConfig stores the current session data in memory.
+type SessionConfig struct {
+	Exchange         string
+	Strategy         string
+	BTCWalletAddress string
+	APIKey           string
+	APISecret        string
+	PPBuyPrice       string
+	PPSellPrice      string
+	BotStatus        string
+}
+
 // Bot is the singleton that holds all the data.
 type Bot struct {
 	config    *BotConfig
 	exchanges []exchange.BotExchange
 	store     influx.Client
+	session   *SessionConfig
 }
 
 var bot Bot
@@ -57,13 +70,26 @@ func main() {
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(middleware.CORS())
 
-	var err error
-	bot.store, err = influx.NewHTTPClient(influx.HTTPConfig{
-		Addr: "http://ec2-54-169-102-171.ap-southeast-1.compute.amazonaws.com:8086",
-	})
-	if err != nil {
-		e.Logger.Fatal("unable to connect to db.")
+	if len(os.Getenv("T_PROD")) > 0 {
+		bot.store, _ = influx.NewHTTPClient(influx.HTTPConfig{
+			Addr: "http://ec2-54-169-102-171.ap-southeast-1.compute.amazonaws.com:8086",
+		})
+	} else {
+		bot.store, _ = influx.NewHTTPClient(influx.HTTPConfig{
+			Addr: "http://localhost:8086",
+		})
+	}
+
+	bot.session = &SessionConfig{
+		Exchange:         "livecoin",
+		Strategy:         "pp",
+		BTCWalletAddress: "",
+		APIKey:           "",
+		APISecret:        "",
+		PPBuyPrice:       "",
+		PPSellPrice:      "",
 	}
 
 	loadConfig()
@@ -81,7 +107,9 @@ func main() {
 	e.Add("GET", "/bot/suspend", suspend)
 	e.Add("GET", "/ws", socket)
 
-	e.Add("POST", "/bot/setup", index)
+	e.Add("POST", "/bot/setup", setup)
+	e.Add("POST", "/bot/setup/pp", setupPingpong)
+	e.Add("POST", "/bot/setup/portfolio", setupPortfolio)
 
 	if port, ok := os.LookupEnv("PORT"); ok {
 		e.Logger.Fatal(e.Start(":" + port))
@@ -92,6 +120,28 @@ func main() {
 
 func index(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
+}
+
+func setup(c echo.Context) error {
+	return c.JSON(http.StatusOK, echo.Map{
+		"success": true,
+	})
+}
+
+func setupPingpong(c echo.Context) error {
+	return c.JSON(http.StatusOK, echo.Map{
+		"success": true,
+	})
+}
+
+func setupPortfolio(c echo.Context) error {
+	log.Printf("%+v", c.Request())
+	log.Print(c.FormValue("btc"))
+	log.Print(c.FormValue("key"))
+	log.Print(c.FormValue("secret"))
+	return c.JSON(http.StatusOK, echo.Map{
+		"success": true,
+	})
 }
 
 func restart(c echo.Context) error {

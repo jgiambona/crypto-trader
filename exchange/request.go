@@ -2,7 +2,6 @@ package exchange
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -33,7 +32,6 @@ func (o *Base) SendPayload(method, path string, headers map[string]string, body 
 		return err
 	}
 
-	fmt.Println("response contents:", string(contents))
 	err = json.Unmarshal(contents, &result)
 	return err
 }

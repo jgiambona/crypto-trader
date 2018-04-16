@@ -2,10 +2,12 @@ package livecoin
 
 import (
 	"log"
+	"os"
 	"time"
 
 	"github.com/ffimnsr/trader/exchange"
 	influx "github.com/influxdata/influxdb/client/v2"
+	"github.com/labstack/echo"
 )
 
 // Base API URL.
@@ -67,9 +69,16 @@ func NewInstance() *LiveCoin {
 	x := new(LiveCoin)
 	x.Name = "LiveCoin"
 	x.Enabled = true
-	x.Store, _ = influx.NewHTTPClient(influx.HTTPConfig{
-		Addr: "http://ec2-54-169-102-171.ap-southeast-1.compute.amazonaws.com:8086",
-	})
+	if len(os.Getenv("T_PROD")) > 0 {
+		x.Store, _ = influx.NewHTTPClient(influx.HTTPConfig{
+			Addr: "http://ec2-54-169-102-171.ap-southeast-1.compute.amazonaws.com:8086",
+		})
+	} else {
+		x.Store, _ = influx.NewHTTPClient(influx.HTTPConfig{
+			Addr: "http://localhost:8086",
+		})
+	}
+
 	return x
 }
 
@@ -82,7 +91,7 @@ func (e *LiveCoin) GetFee(maker bool) float64 {
 }
 
 // UpdateTicker updates and returns ticker for a currency pair.
-func (e *LiveCoin) UpdateTicker() {
+func (e *LiveCoin) UpdateTicker() echo.Map {
 	p, err := e.GetTicker("BTC/USD")
 	if err != nil {
 		log.Fatal(err.Error())
@@ -101,7 +110,7 @@ func (e *LiveCoin) UpdateTicker() {
 		"pair":     "btc_usd",
 		"exchange": "livecoin",
 	}
-	fields := map[string]interface{}{
+	fields := echo.Map{
 		"last":     p.Last,
 		"high":     p.High,
 		"low":      p.Low,
@@ -118,4 +127,6 @@ func (e *LiveCoin) UpdateTicker() {
 	if err != nil {
 		log.Fatalf("%s", err.Error())
 	}
+
+	return fields
 }

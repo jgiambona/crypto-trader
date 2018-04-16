@@ -10,7 +10,6 @@ import (
 
 	"github.com/gorilla/websocket"
 	influx "github.com/influxdata/influxdb/client/v2"
-	"github.com/labstack/echo"
 )
 
 // Ticker for websocket GDAX.
@@ -43,20 +42,20 @@ func socketCheckBalance() {
 	}
 	defer c.Close()
 
-	data, err := json.Marshal(echo.Map{
-		"type": "subscribe",
-		"channels": []echo.Map{
-			echo.Map{
-				"name":        "ticker",
-				"product_ids": []string{"BTC-USD"},
-			},
-		},
-	})
-	if err != nil {
-		log.Fatalf("%s", err.Error())
-	}
+	// data, err := json.Marshal(echo.Map{
+	// 	"type": "subscribe",
+	// 	"channels": []echo.Map{
+	// 		echo.Map{
+	// 			"name":        "ticker",
+	// 			"product_ids": []string{"BTC-USD"},
+	// 		},
+	// 	},
+	// })
+	// if err != nil {
+	// 	log.Fatalf("%s", err.Error())
+	// }
 
-	err = c.WriteMessage(websocket.TextMessage, data)
+	// err = c.WriteMessage(websocket.TextMessage, data)
 	if err != nil {
 		log.Println("write: ", err.Error())
 	}
@@ -71,7 +70,8 @@ func socketCheckBalance() {
 			}
 
 			go func(x []byte) {
-				writeTicker(x)
+				log.Print(x)
+				// writeTicker(x)
 			}(message)
 		}
 	}()

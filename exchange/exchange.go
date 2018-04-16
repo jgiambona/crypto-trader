@@ -2,6 +2,8 @@ package exchange
 
 import (
 	"time"
+
+	"github.com/labstack/echo"
 )
 
 type (
@@ -20,7 +22,7 @@ type (
 	BotExchange interface {
 		GetName() string
 		IsEnabled() bool
-		UpdateTicker()
+		UpdateTicker() echo.Map
 	}
 )
 
