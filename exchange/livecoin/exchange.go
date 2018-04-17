@@ -1,8 +1,12 @@
 package livecoin
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/ffimnsr/trader/exchange"
@@ -48,8 +52,8 @@ type (
 		exchange.Base
 	}
 
-	// Ticker stores the pricing information.
-	Ticker struct {
+	// TickerResponse stores the pricing information.
+	TickerResponse struct {
 		Currency     string  `json:"cur"`
 		CurrencyPair string  `json:"symbol"`
 		Last         float64 `json:"last"`
@@ -78,6 +82,8 @@ func NewInstance() *LiveCoin {
 			Addr: "http://localhost:8086",
 		})
 	}
+	x.AvailableCurrencyPairs = strings.Fields(CurrencyPairAllowed)
+	x.BaseCurrencies = strings.Fields(CurrencyAllowed)
 
 	return x
 }
@@ -85,16 +91,16 @@ func NewInstance() *LiveCoin {
 // GetFee returns the current fee for the exchange.
 func (e *LiveCoin) GetFee(maker bool) float64 {
 	if maker {
-		return 0.0
+		return 0.18 / 100
 	}
-	return 0.0
+	return 0.18 / 100
 }
 
 // UpdateTicker updates and returns ticker for a currency pair.
 func (e *LiveCoin) UpdateTicker() echo.Map {
 	p, err := e.GetTicker("BTC/USD")
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Println(err.Error())
 	}
 
 	bp, err := influx.NewBatchPoints(influx.BatchPointsConfig{
@@ -102,7 +108,7 @@ func (e *LiveCoin) UpdateTicker() echo.Map {
 		Precision: "s",
 	})
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Println(err.Error())
 	}
 
 	tags := map[string]string{
@@ -111,22 +117,44 @@ func (e *LiveCoin) UpdateTicker() echo.Map {
 		"exchange": "livecoin",
 	}
 	fields := echo.Map{
-		"last":     p.Last,
-		"high":     p.High,
-		"low":      p.Low,
-		"volume":   p.Volume,
-		"min_ask":  p.MinAsk,
-		"max_bid":  p.MaxBid,
-		"best_ask": p.BestAsk,
-		"best_bid": p.BestBid,
+		"symbol":        p.Currency,
+		"high":          p.High,
+		"low":           p.Low,
+		"volume":        p.Volume,
+		"ask":           p.BestAsk,
+		"askVolume":     -1,
+		"bid":           p.BestBid,
+		"bidVolume":     -1,
+		"vwap":          p.Vwap,
+		"open":          -1,
+		"close":         p.Last,
+		"previousClose": -1,
+		"change":        -1,
+		"percentage":    -1,
+		"average":       -1,
+		"baseVolume":    p.Volume,
+		"quoteVolume":   p.Volume * p.Vwap,
 	}
 
 	pt, err := influx.NewPoint("stream", tags, fields, time.Now())
 	bp.AddPoint(pt)
 	err = e.Store.Write(bp)
 	if err != nil {
-		log.Fatalf("%s", err.Error())
+		log.Println(err.Error())
 	}
 
 	return fields
+}
+
+// According to the API Examples of LiveCoin:
+// Signature is a HMAC-SHA256 encoded message. The HMAC-SHA256
+// code is generated using a secret key that was generated
+// with your API key. Generated signatures must be converted
+// into hexadecimal format and uppercase characters
+func createSignature(message string, secret string) string {
+	key := []byte(secret)
+	h := hmac.New(sha256.New, key)
+	h.Write([]byte(message))
+	d := hex.EncodeToString(h.Sum(nil))
+	return strings.ToUpper(d)
 }

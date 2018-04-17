@@ -1,1 +1,1 @@
-package strategy
+package indicator

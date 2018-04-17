@@ -5,9 +5,16 @@ import (
 	"log"
 )
 
+// GetTickerAll - Get information on all currency pair for the last 24 hours.
+func (e *LiveCoin) GetTickerAll() (TickerResponse, error) {
+	result := TickerResponse{}
+	path := fmt.Sprintf("%s/exchange/ticker", LiveCoinAPIURL)
+	return result, e.SendPayload("GET", path, nil, nil, &result)
+}
+
 // GetTicker - Get information on specified currency pair for the last 24 hours.
-func (e *LiveCoin) GetTicker(currencyPair string) (Ticker, error) {
-	result := Ticker{}
+func (e *LiveCoin) GetTicker(currencyPair string) (TickerResponse, error) {
+	result := TickerResponse{}
 	path := fmt.Sprintf("%s/exchange/ticker?currencyPair=%s", LiveCoinAPIURL, currencyPair)
 	return result, e.SendPayload("GET", path, nil, nil, &result)
 }

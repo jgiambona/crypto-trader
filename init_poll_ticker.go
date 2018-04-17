@@ -65,7 +65,7 @@ func pollTicker() {
 					log.Fatal("unable to check live data.")
 				} else {
 					values := c.UpdateTicker()
-					lastPairPrice = values["last"].(float64)
+					lastPairPrice = values["close"].(float64)
 				}
 
 				if len(prices) > 0 {

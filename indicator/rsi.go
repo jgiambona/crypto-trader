@@ -1,4 +1,4 @@
-package strategy
+package indicator
 
 // RSIOptions to configure the behaviour of RSI.
 type RSIOptions struct {

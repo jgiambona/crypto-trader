@@ -1,8 +1,6 @@
 package exchange
 
 import (
-	"time"
-
 	"github.com/labstack/echo"
 )
 
@@ -10,12 +8,13 @@ type (
 	// Base holds common features that identifies
 	// the exchange platform.
 	Base struct {
-		Name         string
-		APIBaseURL   string
-		APIKey       string
-		APISecret    string
-		PollingDelay time.Duration
-		Enabled      bool
+		Name                   string
+		APIBaseURL             string
+		APIKey                 string
+		APISecret              string
+		Enabled                bool
+		AvailableCurrencyPairs []string
+		BaseCurrencies         []string
 	}
 
 	// BotExchange TODO
