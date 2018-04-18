@@ -1,0 +1,834 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_INFLUXDB",
+      "label": "influxdb",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "influxdb",
+      "pluginName": "InfluxDB"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "5.0.4"
+    },
+    {
+      "type": "panel",
+      "id": "graph",
+      "name": "Graph",
+      "version": "5.0.0"
+    },
+    {
+      "type": "datasource",
+      "id": "influxdb",
+      "name": "InfluxDB",
+      "version": "5.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "singlestat",
+      "name": "Singlestat",
+      "version": "5.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "table",
+      "name": "Table",
+      "version": "5.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "text",
+      "name": "Text",
+      "version": "5.0.0"
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "${DS_INFLUXDB}",
+        "enable": false,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "limit": 100,
+        "name": "Annotations & Alerts",
+        "showIn": 0,
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "${DS_INFLUXDB}",
+      "fill": 1,
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 15,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "stream",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "last"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "BTC / USD - Price History",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "decimals": 1,
+          "format": "currencyUSD",
+          "label": "Market Price",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
+        }
+      ]
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "${DS_INFLUXDB}",
+      "decimals": 4,
+      "description": "Volume base on LiveCoin ticker.",
+      "fill": 2,
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 7
+      },
+      "hideTimeOverride": false,
+      "id": 6,
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "sideWidth": null,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "volume",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "stream",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "volume"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "max"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "pair",
+              "operator": "=",
+              "value": "btc_usd"
+            },
+            {
+              "condition": "AND",
+              "key": "exchange",
+              "operator": "=",
+              "value": "livecoin"
+            },
+            {
+              "condition": "AND",
+              "key": "type",
+              "operator": "=",
+              "value": "ticker"
+            }
+          ]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Volume",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "decimals": 2,
+          "format": "short",
+          "label": "Trade Volume",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ]
+    },
+    {
+      "content": "<script type=\"text/javascript\">\n  $(document).ready(() => {\n    $(\"form#setupp\").submit(function(event) {\n      event.preventDefault()\n      var exchange = $(\"#ep\").val()\n      var strategy = $(\"#sp\").val()\n\n      console.log(\"saving settings in backend...\")\n      $.ajax({\n        type: \"POST\",\n        url: \"http://ec2-54-169-102-171.ap-southeast-1.compute.amazonaws.com:8000/bot/setup\",\n        data: \"x=\" + exchange + \"&s=\" + strategy,\n        success: function(){\n          console.log('saved.')\n        }\n      })\n    })\n  })\n</script>\n<br/>\n<form id=\"setupp\" method=\"post\">\n  <div class=\"gf-form\">\n    <label for=\"ep\" class=\"gf-form-label width-10\">Exchange</label>\n    <div class=\"gf-form-select-wrapper max-width-20\">\n      <select name=\"exchange\" id=\"ep\" class=\"input-large gf-form-input\">\n        <option disabled>Choose an exchange to use</option>\n        <option selected value=\"livecoin\">Livecoin</option> \n        <option value=\"poloniex\" disabled>Poloniex</option>\n        <option value=\"gdax\" disabled>GDAX</option>\n      </select>\n    </div>\n  </div>\n  <div class=\"gf-form\">\n    <label for=\"sp\" class=\"gf-form-label width-10\">Buy / Sell Strategy</label>\n    <div class=\"gf-form-select-wrapper max-width-20\">\n      <select name=\"strategy\" id=\"sp\" class=\"input-large gf-form-input\">\n        <option disabled>Choose strategy to use</option>\n        <option selected value=\"pp\">Pingpong</option>\n        <option value=\"uptrend\">Uptrend</option>\n        <option value=\"wavetrend\">Wavetrend</option>\n        <option value=\"bb\" disabled>Bollinger Bands</option>\n        <option value=\"bbgain\" disabled>Bollinger Bands - Gain</option>\n        <option value=\"bbpp\" disabled>Bollinger Bands - Pingpong</option>\n        <option value=\"bbrsitssl\" disabled>Bollinger Bands &#43; RSI - Trailing Stop / Stop Limit</option>\n        <option value=\"bbstepgain\" disabled>Bollinger Bands - Stepgain</option>\n        <option value=\"bbtssl\" disabled>Bollinger Bands - Trailing Stop / Stop Limit</option>\n        <option value=\"emotionless\" disabled>Emotionless</option>\n        <option value=\"gain\" disabled>Gain</option>\n        <option value=\"gainbb\" disabled>Gain - Bollinger Bands</option>\n        <option value=\"gainpp\" disabled>Gain - Pingpong</option>\n        <option value=\"gainstepgain\" disabled>Gain - Stepgain</option>\n        <option value=\"gaintssl\" disabled>Gain - Trailing Stop / Stop Limit</option>\n        <option value=\"ichimoku\" disabled>Ichimoku</option>\n        <option value=\"ppbb\" disabled>Pingpong - Bollinger Bands</option>\n        <option value=\"ppstepgain\" disabled>Pingpong - Stepgain</option>\n        <option value=\"pptssl\" disabled>Pingpong - Trailing Stop / Stop Limit</option>\n        <option value=\"stepgain\" disabled>Stepgain</option>\n        <option value=\"stepgainbb\" disabled>Stepgain - Bollinger Bands</option>\n        <option value=\"stepgaingain\" disabled>Stepgain - Gain</option>\n        <option value=\"stepgainpp\" disabled>Stepgain - Pingpong</option>\n        <option value=\"stepgaintssl\" disabled>Stepgain - Trailing Stop / Stop Limit</option>\n        <option value=\"tssl\" disabled>Trailing Stop / Stop Limit</option>\n        <option value=\"tsslbb\" disabled>Trailing Stop / Stop Limit - Bollinger Bands</option>\n        <option value=\"tsslgain\" disabled>Trailing Stop / Stop Limit - Gain</option>\n        <option value=\"tsslpp\" disabled>Trailing Stop / Stop Limit - Pingpong</option>\n        <option value=\"tsslstepgain\" disabled>Trailing Stop / Stop Limit - Stepgain</option>\n      </select>\n    </div>\n  </div>\n  <br/>\n  <button class=\"btn btn-success width-10\" type=\"submit\">Change Settings</button>\n</form>",
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 14
+      },
+      "id": 8,
+      "links": [],
+      "mode": "html",
+      "repeat": null,
+      "title": "Trader  Bot Settings",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "content": "<div id=\"portfolioPanel\" class=\"ng-scope\">\n  <script type=\"text/javascript\">\n    $(document).ready(() => {\n      $(\"form#portfoliop\").submit(function(event) {\n        event.preventDefault()\n        var btc = $(\"#pbtc\").val()\n        var key = $(\"#papk\").val()\n        var secret = $(\"#paps\").val()\n  \n        console.log(\"saving portfolio settings in backend...\")\n        $.ajax({\n          type: \"POST\",\n          url: \"http://ec2-54-169-102-171.ap-southeast-1.compute.amazonaws.com:8000/bot/setup/portfolio\",\n          data: \"btc=\" + btc + \"&key=\" + key + \"&secret=\" + secret,\n          success: function(){\n            console.log('saved.')\n          }\n        })\n      })\n    })\n  </script>\n  <form id=\"portfoliop\" method=\"post\">\n    <div class=\"gf-form\">\n      <span class=\"gf-form-label width-10\">BTC Wallet Address</span>\n      <input id=\"tbp\" type=\"text\" class=\"gf-form-input width-20\">\n    </div>\n    <div class=\"gf-form\">\n      <span class=\"gf-form-label width-10\">API Key</span>\n      <input id=\"sbp\" type=\"text\" class=\"gf-form-input width-20\">\n    </div>\n    <div class=\"gf-form\">\n      <span class=\"gf-form-label width-10\">API Secret</span>\n      <input id=\"sbp\" type=\"text\" class=\"gf-form-input width-20\">\n    </div>\n    <br/>\n    <button class=\"btn btn-success width-10\" type=\"submit\">Save</button>\n  </form>\n  <br/>\n  <button class=\"btn btn-success\">Run Simulation</button>\n  <button class=\"btn btn-success\">Backfill</button>\n  <button class=\"btn btn-warning\">Stop</button>\n</div>",
+      "gridPos": {
+        "h": 7,
+        "w": 10,
+        "x": 8,
+        "y": 14
+      },
+      "id": 10,
+      "links": [],
+      "mode": "html",
+      "title": "Portfolio",
+      "transparent": false,
+      "type": "text"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "${DS_INFLUXDB}",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 6,
+        "x": 18,
+        "y": 14
+      },
+      "id": 12,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "thresholds": "",
+      "title": "Bitcoin Wallet Balance",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": true,
+      "colors": [
+        "#d44a3a",
+        "rgba(237, 129, 40, 0.89)",
+        "#299c46"
+      ],
+      "datasource": "${DS_INFLUXDB}",
+      "decimals": 2,
+      "format": "currencyUSD",
+      "gauge": {
+        "maxValue": null,
+        "minValue": null,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": false
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 6,
+        "x": 18,
+        "y": 17
+      },
+      "id": 13,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "80%",
+      "prefix": "USD",
+      "prefixFontSize": "80%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": true
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "stream",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "last"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "exchange",
+              "operator": "=",
+              "value": "livecoin"
+            },
+            {
+              "condition": "AND",
+              "key": "pair",
+              "operator": "=",
+              "value": "btc_usd"
+            }
+          ]
+        }
+      ],
+      "thresholds": "",
+      "title": "Bitcoin Price",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "first"
+    },
+    {
+      "content": "<script type=\"text/javascript\">\n  $(document).ready(() => {\n    $(\"form#tradep\").submit(function(event) {\n      event.preventDefault()\n      var buy = $(\"#tbp\").val()\n      var sell = $(\"#tsp\").val()\n\n      console.log(\"saving trade settings in backend...\")\n      $.ajax({\n        type: \"POST\",\n        url: \"http://ec2-54-169-102-171.ap-southeast-1.compute.amazonaws.com:8000/bot/setup/pp\",\n        data: \"bp=\" + buy + \"&sp=\" + sell,\n        success: function(){\n          console.log('saved.')\n        }\n      })\n    })\n  })\n</script>\n<br/>\n<form id=\"tradep\" method=\"post\">\n  <div class=\"gf-form\">\n    <span class=\"gf-form-label width-10\">Buy Price</span>\n    <input id=\"tbp\" type=\"text\" class=\"gf-form-input width-20\">\n  </div>\n  <div class=\"gf-form\">\n    <span class=\"gf-form-label width-10\">Sell Price</span>\n    <input id=\"sbp\" type=\"text\" class=\"gf-form-input width-20\">\n  </div>\n  <br/>\n  <button class=\"btn btn-success width-10\" type=\"submit\">Change</button>\n</form>",
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 0,
+        "y": 20
+      },
+      "id": 17,
+      "links": [],
+      "mode": "html",
+      "title": "Ping Pong",
+      "transparent": false,
+      "type": "text"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "${DS_INFLUXDB}",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 18,
+        "y": 20
+      },
+      "id": 19,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "thresholds": "",
+      "title": "Bot Status",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "content": "# BTC / USD",
+      "gridPos": {
+        "h": 4,
+        "w": 5,
+        "x": 8,
+        "y": 21
+      },
+      "id": 21,
+      "links": [],
+      "mode": "markdown",
+      "title": "Currency Pair",
+      "type": "text"
+    },
+    {
+      "content": "",
+      "gridPos": {
+        "h": 4,
+        "w": 5,
+        "x": 13,
+        "y": 21
+      },
+      "id": 23,
+      "links": [],
+      "mode": "markdown",
+      "title": "Special Settings",
+      "type": "text"
+    },
+    {
+      "columns": [],
+      "datasource": "${DS_INFLUXDB}",
+      "fontSize": "100%",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 25
+      },
+      "id": 4,
+      "links": [],
+      "pageSize": null,
+      "scroll": true,
+      "showHeader": true,
+      "sort": {
+        "col": 0,
+        "desc": true
+      },
+      "styles": [
+        {
+          "alias": "Time",
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "pattern": "Time",
+          "type": "date"
+        },
+        {
+          "alias": "",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "decimals": 2,
+          "pattern": "/.*/",
+          "thresholds": [],
+          "type": "number",
+          "unit": "short"
+        }
+      ],
+      "targets": [
+        {
+          "groupBy": [],
+          "measurement": "stream",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "*"
+                ],
+                "type": "field"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "title": "Trader Bot Action Logs",
+      "transform": "timeseries_to_columns",
+      "type": "table"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 16,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now/d",
+    "to": "now/d"
+  },
+  "timepicker": {
+    "hidden": true,
+    "refresh_intervals": [
+      "30s",
+      "1m",
+      "5m",
+      "15m"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  },
+  "timezone": "browser",
+  "title": "Trader Bot",
+  "uid": "A_yLIgWiz",
+  "version": 25
+}
