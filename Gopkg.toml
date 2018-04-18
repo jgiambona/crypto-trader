@@ -40,3 +40,11 @@
   name = "github.com/gorilla/websocket"
   version = "1.2.0"
 
+
+[[constraint]]
+  name = "github.com/mattn/go-sqlite3"
+  version = "1.6.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/markcheno/go-talib"

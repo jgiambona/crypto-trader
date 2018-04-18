@@ -1,15 +1,19 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 
 	"github.com/ffimnsr/trader/exchange"
+	"github.com/gorilla/websocket"
 	influx "github.com/influxdata/influxdb/client/v2"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 var strategies = map[string]string{
@@ -107,6 +111,7 @@ func main() {
 	e.Add("GET", "/bot/suspend", suspend)
 	e.Add("GET", "/ws", socket)
 
+	e.Add("POST", "/bot/add-account", addAccount)
 	e.Add("POST", "/bot/setup", setup)
 	e.Add("POST", "/bot/setup/pp", setupPingpong)
 	e.Add("POST", "/bot/setup/portfolio", setupPortfolio)
@@ -120,6 +125,12 @@ func main() {
 
 func index(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
+}
+
+func addAccount(c echo.Context) error {
+	return c.JSON(http.StatusOK, echo.Map{
+		"success": true,
+	})
 }
 
 func setup(c echo.Context) error {
@@ -176,22 +187,41 @@ func getExchangeConfigInfo(c echo.Context) error {
 }
 
 func socket(c echo.Context) error {
-	//websocket.Handler(func(ws *websocket.Conn) {
-	//	defer ws.Close()
-	//	for {
-	//		err := websocket.Message.Send(ws, "Hello, Client!")
-	//		if err != nil {
-	//			c.Logger().Error(err)
-	//		}
+	websocket.Handler(func(ws *websocket.Conn) {
+		defer ws.Close()
+		for {
+			err := websocket.Message.Send(ws, "Hello, Client!")
+			if err != nil {
+				c.Logger().Error(err)
+			}
 
-	//		msg := ""
-	//		err = websocket.Message.Receive(ws, &msg)
-	//		if err != nil {
-	//			c.Logger().Error(err)
-	//		}
+			msg := ""
+			err = websocket.Message.Receive(ws, &msg)
+			if err != nil {
+				c.Logger().Error(err)
+			}
 
-	//		fmt.Printf("%s\n", msg)
-	//	}
-	//}).ServeHTTP(c.Response(), c.Request())
+			fmt.Printf("%s\n", msg)
+		}
+	}).ServeHTTP(c.Response(), c.Request())
 	return nil
+}
+
+func createLocalDB() error {
+	db, err := sql.Open("sqlite3", "./data/trader.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	query := `
+	create table accounts (id integer not null primary key, apiKey text, apiSecret text);
+	delete from accounts;
+	`
+
+	_, err := db.Exec(query)
+	if err != nil {
+		log.Print("%q: %n", err, query)
+		return err
+	}
 }
