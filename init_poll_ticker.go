@@ -6,11 +6,14 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/ffimnsr/trader/exchange"
+	influx "github.com/influxdata/influxdb/client/v2"
+	"github.com/labstack/echo"
 )
 
 type (
@@ -33,12 +36,22 @@ func pollTicker() {
 	var prices []float64
 	var err error
 
+	pair := "btc_usd"
+	quantity := 0.001
 	currentMovingAverage := float64(0)
 	lenghtOfMA := 0
-	simulation := false
+	simulation := bot.simulation
 	historicalData := []Period{}
 	tradePlaced := false
 	typeOfTrade := ""
+	if simulation {
+		log.Print("getting historical data")
+		historicalData, err = getHistoricalData()
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+	}
+
 	for {
 		waitExchanges.Add(len(bot.exchanges))
 		for _, x := range bot.exchanges {
@@ -50,11 +63,6 @@ func pollTicker() {
 			go func(c exchange.BotExchange) {
 				defer waitExchanges.Done()
 
-				historicalData, err = getTestData()
-				if err != nil {
-					log.Fatal(err.Error())
-				}
-
 				var lastPairPrice float64
 				if simulation && (len(historicalData) > 0) {
 					var nextDataPoint Period
@@ -62,7 +70,8 @@ func pollTicker() {
 					nextDataPoint, historicalData = historicalData[0], historicalData[1:]
 					lastPairPrice = nextDataPoint.WeightedAverage
 				} else if simulation && (len(historicalData) < 1) {
-					log.Fatal("unable to check live data.")
+					log.Print("finish running historical data")
+					os.Exit(1)
 				} else {
 					values := c.UpdateTicker()
 					lastPairPrice = values["close"].(float64)
@@ -74,22 +83,38 @@ func pollTicker() {
 					if !tradePlaced {
 						if (lastPairPrice > currentMovingAverage) && (lastPairPrice < previousPrice) {
 							log.Print("SELL ORDER")
+							insertTransaction("sell", pair, lastPairPrice, quantity)
+							if !simulation {
+
+							}
 							tradePlaced = true
 							typeOfTrade = "short"
 						} else if (lastPairPrice < currentMovingAverage) && (lastPairPrice > previousPrice) {
 							log.Print("BUY ORDER")
+							insertTransaction("buy", pair, lastPairPrice, quantity)
+							if !simulation {
+
+							}
 							tradePlaced = true
 							typeOfTrade = "long"
 						}
 					} else if typeOfTrade == "short" {
 						if lastPairPrice < currentMovingAverage {
 							log.Print("EXIT TRADE")
+							insertTransaction("cancel", pair, lastPairPrice, quantity)
+							if !simulation {
+
+							}
 							tradePlaced = false
 							typeOfTrade = ""
 						}
 					} else if typeOfTrade == "long" {
 						if lastPairPrice > currentMovingAverage {
 							log.Print("EXIT TRADE")
+							insertTransaction("cancel", pair, lastPairPrice, quantity)
+							if !simulation {
+
+							}
 							tradePlaced = false
 							typeOfTrade = ""
 						}
@@ -117,7 +142,7 @@ func sum(c []float64) float64 {
 	return sum
 }
 
-func getTestData() ([]Period, error) {
+func getHistoricalData() ([]Period, error) {
 	result := []Period{}
 	path := "https://poloniex.com/public?command=returnChartData&currencyPair=BTC_XMR&start=1405699200&end=9999999999&period=14400"
 	return result, sendPayload("GET", path, nil, nil, &result)
@@ -150,31 +175,29 @@ func sendPayload(method, path string, headers map[string]string, body io.Reader,
 	return err
 }
 
-func insertTransactions() {
-	//bp, err := influx.NewBatchPoints(influx.BatchPointsConfig{
-	//	Database:  "trader",
-	//	Precision: "s",
-	//})
-	//if err != nil {
-	//	log.Fatalf("%s", err.Error())
-	//}
+func insertTransaction(t, pair string, price, quantity float64) {
+	bp, err := influx.NewBatchPoints(influx.BatchPointsConfig{
+		Database:  "trader",
+		Precision: "s",
+	})
+	if err != nil {
+		log.Fatalf("%s", err.Error())
+	}
 
-	//tags := map[string]string{
-	//	"exchange": "livecoin",
-	//	"pair":     "btc_usd",
-	//	"type":     "buy",
-	//}
-	//fields := echo.Map{
-	//	"price":  1.444,
-	//	"amount": 1.444,
-	//	"fee":    1.4444,
-	//	"volume": 1.4444,
-	//}
+	tags := map[string]string{
+		"exchange": "livecoin",
+		"pair":     pair,
+		"type":     t,
+	}
+	fields := echo.Map{
+		"price":    price,
+		"quantity": quantity,
+	}
 
-	//pt, err := influx.NewPoint("transactions", tags, fields, time.Now())
-	//bp.AddPoint(pt)
-	//err = bot.store.Write(bp)
-	//if err != nil {
-	//	log.Fatalf("%s", err.Error())
-	//}
+	pt, err := influx.NewPoint("transactions", tags, fields, time.Now())
+	bp.AddPoint(pt)
+	err = bot.store.Write(bp)
+	if err != nil {
+		log.Fatalf("%s", err.Error())
+	}
 }

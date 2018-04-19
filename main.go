@@ -14,11 +14,12 @@ import (
 
 // Bot is the singleton that holds all the data.
 type Bot struct {
-	config    *BotConfig
-	exchanges []exchange.BotExchange
-	store     influx.Client
-	db        *sql.DB
-	nextID    int64
+	config     *BotConfig
+	exchanges  []exchange.BotExchange
+	store      influx.Client
+	simulation bool
+	db         *sql.DB
+	nextID     int64
 }
 
 var bot Bot
@@ -29,6 +30,9 @@ func main() {
 
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
+
+	// Enable paper trading.
+	bot.simulation = true
 
 	// Create and open SQLite3 database file.
 	var err error
@@ -68,11 +72,11 @@ func main() {
 	loadRoutes(e)
 
 	//go socketCheckBalance()
-	//go pollTicker()
+	go pollTicker()
 
 	if port, ok := os.LookupEnv("PORT"); ok {
 		e.Logger.Fatal(e.Start(":" + port))
 	} else {
-		e.Logger.Fatal(e.Start(":8000"))
+		e.Logger.Fatal(e.Start("localhost:8000"))
 	}
 }
