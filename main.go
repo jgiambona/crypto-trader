@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/ffimnsr/trader/exchange"
@@ -39,7 +38,7 @@ func main() {
 	}
 	defer bot.db.Close()
 
-	if err := createLocalDB(); err != nil {
+	if err := repoCreateDB(); err != nil {
 		e.Logger.Fatal(err)
 	}
 
@@ -53,7 +52,7 @@ func main() {
 		})
 	}
 
-	id, err := getLastAccountID()
+	id, err := repoGetLastAccountID()
 	if err != nil {
 		e.Logger.Fatal(err)
 	}
@@ -66,42 +65,14 @@ func main() {
 		e.Logger.Fatal("no exchanges were loaded.")
 	}
 
+	loadRoutes(e)
+
 	//go socketCheckBalance()
 	//go pollTicker()
-
-	e.Add("GET", "/", index)
-	e.Add("GET", "/bot/:name/info", getExchangeConfigInfo)
-	e.Add("GET", "/bot/restart", restart)
-	e.Add("GET", "/bot/suspend", suspend)
-
-	e.Add("POST", "/bot/setup", setup)
-	e.Add("POST", "/bot/setup/pp", setupPingpong)
-	e.Add("POST", "/bot/setup/portfolio", addNewPortfolio)
-	e.Add("POST", "/bot/setup/portfolio/create", addNewPortfolio)
 
 	if port, ok := os.LookupEnv("PORT"); ok {
 		e.Logger.Fatal(e.Start(":" + port))
 	} else {
 		e.Logger.Fatal(e.Start(":8000"))
 	}
-}
-
-func setup(c echo.Context) error {
-	return c.JSON(http.StatusOK, echo.Map{
-		"success": true,
-	})
-}
-
-func setupPingpong(c echo.Context) error {
-	return c.JSON(http.StatusOK, echo.Map{
-		"success": true,
-	})
-}
-
-func restart(c echo.Context) error {
-	return c.NoContent(http.StatusOK)
-}
-
-func suspend(c echo.Context) error {
-	return c.NoContent(http.StatusOK)
 }
