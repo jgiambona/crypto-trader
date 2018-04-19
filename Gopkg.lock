@@ -45,6 +45,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/markcheno/go-quote"
+  packages = ["."]
+  revision = "e6da0e1ff252dd1a6f4fb058530b272ff1a4ac0f"
+
+[[projects]]
+  branch = "master"
   name = "github.com/markcheno/go-talib"
   packages = ["."]
   revision = "a54addab57bfd1d6da249179fda39aa572da35ef"
@@ -103,6 +109,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c71431a258334d6bbf1d305bcd624be859e9c5d12433733cbdbbd4450e935d12"
+  inputs-digest = "1c28d1cd0cc3c431d380b6646e86465ca2fe72808c95ab5863d2587031f00533"
   solver-name = "gps-cdcl"
   solver-version = 1

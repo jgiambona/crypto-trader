@@ -22,9 +22,10 @@ func loadExchanges() error {
 func initializeExchange(name string) error {
 	var exch exchange.BotExchange
 
+	log.Print("--- Exchanges:")
 	switch strings.ToLower(name) {
 	case "livecoin":
-		log.Printf("--- [active] LiveCoin")
+		log.Printf("--- + -- [active] %s", name)
 		exch = livecoin.NewInstance()
 	default:
 		return errors.New("exchange not found")

@@ -8,13 +8,7 @@ import (
 )
 
 type (
-	// Wallet TODO
-	Wallet struct {
-		Address string `yaml:"address"`
-		Type    string `yaml:"type"`
-	}
-
-	// Exchange TODO
+	// Exchange stores the preloaded default exchange from the config.
 	Exchange struct {
 		Name      string `yaml:"name"`
 		RateLimit int64  `yaml:"rateLimit"`
@@ -26,11 +20,8 @@ type (
 		APISecret string `yaml:"apiSecret"`
 	}
 
-	// BotConfig TODO
+	// BotConfig load config.
 	BotConfig struct {
-		Portfolio struct {
-			Addresses []Wallet
-		} `yaml:"portfolio"`
 		Exchanges []Exchange `yaml:"exchanges"`
 	}
 )

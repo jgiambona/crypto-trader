@@ -1,7 +1,3 @@
-portfolio:
-  addresses:
-    - address:
-      type: BTC
 exchanges:
   - name: LiveCoin
     rateLimit: 1000

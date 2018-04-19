@@ -48,3 +48,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/markcheno/go-talib"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/markcheno/go-quote"
