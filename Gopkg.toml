@@ -52,3 +52,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/markcheno/go-quote"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/lib/pq"

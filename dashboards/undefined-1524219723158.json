@@ -1,0 +1,5 @@
+{
+  "error": {
+    "message": "Datasource named influxdb-trader was not found"
+  }
+}

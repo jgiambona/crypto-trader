@@ -45,6 +45,15 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/lib/pq"
+  packages = [
+    ".",
+    "oid"
+  ]
+  revision = "d34b9ff171c21ad295489235aec8b6626023cd04"
+
+[[projects]]
+  branch = "master"
   name = "github.com/markcheno/go-quote"
   packages = ["."]
   revision = "e6da0e1ff252dd1a6f4fb058530b272ff1a4ac0f"
@@ -109,6 +118,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1c28d1cd0cc3c431d380b6646e86465ca2fe72808c95ab5863d2587031f00533"
+  inputs-digest = "d868b439042166c66d628c085729483d3636dc600b42a8928bbc053199c91ed2"
   solver-name = "gps-cdcl"
   solver-version = 1

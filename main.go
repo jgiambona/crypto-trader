@@ -9,7 +9,7 @@ import (
 	influx "github.com/influxdata/influxdb/client/v2"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
 )
 
 // Bot is the singleton that holds all the data.
@@ -36,7 +36,8 @@ func main() {
 
 	// Create and open SQLite3 database file.
 	var err error
-	bot.db, err = sql.Open("sqlite3", "./data/trader.db")
+	connStr := "postgres://trader:trader@localhost/trader?sslmode=disable"
+	bot.db, err = sql.Open("postgres", connStr)
 	if err != nil {
 		e.Logger.Fatal(err)
 	}

@@ -66,12 +66,13 @@ func pollTicker() {
 				var lastPairPrice float64
 				if simulation && (len(historicalData) > 0) {
 					var nextDataPoint Period
+
 					// Pop and shift data.
 					nextDataPoint, historicalData = historicalData[0], historicalData[1:]
 					lastPairPrice = nextDataPoint.WeightedAverage
 				} else if simulation && (len(historicalData) < 1) {
 					log.Print("finish running historical data")
-					os.Exit(1)
+					os.Exit(0)
 				} else {
 					values := c.UpdateTicker()
 					lastPairPrice = values["close"].(float64)
@@ -148,7 +149,8 @@ func getHistoricalData() ([]Period, error) {
 	return result, sendPayload("GET", path, nil, nil, &result)
 }
 
-func sendPayload(method, path string, headers map[string]string, body io.Reader, result interface{}) error {
+func sendPayload(method, path string, headers map[string]string, body io.Reader,
+	result interface{}) error {
 	method = strings.ToUpper(method)
 
 	req, err := http.NewRequest(method, path, body)
@@ -181,7 +183,7 @@ func insertTransaction(t, pair string, price, quantity float64) {
 		Precision: "s",
 	})
 	if err != nil {
-		log.Fatalf("%s", err.Error())
+		log.Fatal(err)
 	}
 
 	tags := map[string]string{
@@ -189,6 +191,7 @@ func insertTransaction(t, pair string, price, quantity float64) {
 		"pair":     pair,
 		"type":     t,
 	}
+
 	fields := echo.Map{
 		"price":    price,
 		"quantity": quantity,
@@ -196,8 +199,12 @@ func insertTransaction(t, pair string, price, quantity float64) {
 
 	pt, err := influx.NewPoint("transactions", tags, fields, time.Now())
 	bp.AddPoint(pt)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	err = bot.store.Write(bp)
 	if err != nil {
-		log.Fatalf("%s", err.Error())
+		log.Fatal(err)
 	}
 }
