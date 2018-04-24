@@ -61,7 +61,7 @@ func repoInsertNewAccount(apiKey, apiSecret string) (int64, error) {
 		return -1, err
 	}
 
-	stmt, err := tx.Prepare("insert into accounts(id, apiKey, apiSecret) values(?, ?, ?)")
+	stmt, err := tx.Prepare("INSERT INTO accounts(id, apiKey, apiSecret) VALUES (?, ?, ?)")
 	if err != nil {
 		return -1, err
 	}

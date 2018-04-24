@@ -43,6 +43,10 @@ func main() {
 	}
 	defer bot.db.Close()
 
+	if err := bot.db.Ping(); err != nil {
+		e.Logger.Fatal(err)
+	}
+
 	if err := repoCreateDB(); err != nil {
 		e.Logger.Fatal(err)
 	}
@@ -73,7 +77,7 @@ func main() {
 	loadRoutes(e)
 
 	//go socketCheckBalance()
-	//go pollTicker()
+	go pollTicker()
 
 	if port, ok := os.LookupEnv("PORT"); ok {
 		e.Logger.Fatal(e.Start(":" + port))
@@ -81,3 +85,4 @@ func main() {
 		e.Logger.Fatal(e.Start("localhost:8000"))
 	}
 }
+

@@ -46,9 +46,12 @@ func pollTicker() {
 	typeOfTrade := ""
 	if simulation {
 		log.Print("getting historical data")
+
+		// Try to get fresh historical data from poloniex server if none
+		// check the data folder for old save data.
 		historicalData, err = getHistoricalData()
 		if err != nil {
-			log.Fatal(err.Error())
+			historicalData, err = getLocalHistoricalData()
 		}
 	}
 
@@ -147,6 +150,18 @@ func getHistoricalData() ([]Period, error) {
 	result := []Period{}
 	path := "https://poloniex.com/public?command=returnChartData&currencyPair=BTC_XMR&start=1405699200&end=9999999999&period=14400"
 	return result, sendPayload("GET", path, nil, nil, &result)
+}
+
+func getLocalHistoricalData() ([]Period, error) {
+	result := []Period{}
+	path := "./data/historical-data-poloniex.json"
+	
+	raw, err := ioutil.ReadFile(path)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	return result, json.Unmarshal(raw, &result)
 }
 
 func sendPayload(method, path string, headers map[string]string, body io.Reader,
