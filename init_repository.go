@@ -67,16 +67,19 @@ func repoInsertNewAccount(apiKey, apiSecret string) (int64, error) {
 	}
 	defer stmt.Close()
 
-	var res sql.Result
-	res, err = stmt.Exec(bot.nextID, apiKey, apiSecret)
-	if err != nil {
-		return -1, err
-	}
-	tx.Commit()
+	log.Print("Hello")
+	return 0, err
 
-	bot.nextID += 1
-	log.Println("insert new account")
-	return res.LastInsertId()
+	//var res sql.Result
+	//res, err = stmt.Exec(bot.nextID, apiKey, apiSecret)
+	//if err != nil {
+	//	return -1, err
+	//}
+	//tx.Commit()
+
+	//bot.nextID += 1
+	//log.Println("insert new account")
+	//return res.LastInsertId()
 }
 
 func repoGetLastAccountID() (int64, error) {
