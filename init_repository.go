@@ -14,7 +14,7 @@ type (
 )
 
 func repoCreateDB() error {
-	query := "create table if not exists accounts (id integer not null primary key, apiKey text, apiSecret text);"
+	query := "CREATE TABLE IF NOT EXISTS accounts (id INTEGER NOT NULL PRIMARY KEY, apiKey TEXT, apiSecret TEXT)"
 
 	_, err := bot.db.Exec(query)
 	if err != nil {
@@ -26,7 +26,7 @@ func repoCreateDB() error {
 
 func repoRowExists(query string, args ...interface{}) bool {
 	var exists bool
-	query = fmt.Sprintf("select exists (%s)", query)
+	query = fmt.Sprintf("SELECT EXISTS (%s)", query)
 	err := bot.db.QueryRow(query, args...).Scan(&exists)
 	if err != nil && err != sql.ErrNoRows {
 		log.Fatal(err)
@@ -37,7 +37,7 @@ func repoRowExists(query string, args ...interface{}) bool {
 func repoListAccounts() ([]Account, error) {
 	var list []Account
 
-	rows, err := bot.db.Query("select * from accounts")
+	rows, err := bot.db.Query("SELECT * FROM accounts")
 	if err != nil {
 		return nil, err
 	}
@@ -56,30 +56,21 @@ func repoListAccounts() ([]Account, error) {
 }
 
 func repoInsertNewAccount(apiKey, apiSecret string) (int64, error) {
-	tx, err := bot.db.Begin()
+	stmt, err := bot.db.Prepare("INSERT INTO accounts(apiKey, apiSecret) VALUES(?, ?)")
 	if err != nil {
 		return -1, err
 	}
 
-	stmt, err := tx.Prepare("INSERT INTO accounts(id, apiKey, apiSecret) VALUES (?, ?, ?)")
+	var res sql.Result
+
+	res, err = stmt.Exec(apiKey, apiSecret)
 	if err != nil {
 		return -1, err
 	}
-	defer stmt.Close()
 
-	log.Print("Hello")
-	return 0, err
-
-	//var res sql.Result
-	//res, err = stmt.Exec(bot.nextID, apiKey, apiSecret)
-	//if err != nil {
-	//	return -1, err
-	//}
-	//tx.Commit()
-
-	//bot.nextID += 1
-	//log.Println("insert new account")
-	//return res.LastInsertId()
+	bot.nextID += 1
+	log.Println("insert new account")
+	return res.LastInsertId()
 }
 
 func repoGetLastAccountID() (int64, error) {

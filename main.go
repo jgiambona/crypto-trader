@@ -77,7 +77,7 @@ func main() {
 	loadRoutes(e)
 
 	//go socketCheckBalance()
-	go pollTicker()
+	//go pollTicker()
 
 	if port, ok := os.LookupEnv("PORT"); ok {
 		e.Logger.Fatal(e.Start(":" + port))
