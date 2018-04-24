@@ -1,6 +1,9 @@
 package main
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"io"
 	"io/ioutil"
@@ -26,6 +29,13 @@ type (
 		Volume          float64 `json:"volume"`
 		QuoteVolume     float64 `json:"quoteVolume"`
 		WeightedAverage float64 `json:"weightedAverage"`
+	}
+
+	// OrderResponse receives the order status.
+	OrderResponse struct {
+		Success bool  `json:"success"`
+		Added   bool  `json:"added"`
+		OrderID int64 `json:"orderId"`
 	}
 )
 
@@ -155,7 +165,7 @@ func getHistoricalData() ([]Period, error) {
 func getLocalHistoricalData() ([]Period, error) {
 	result := []Period{}
 	path := "./data/historical-data-poloniex.json"
-	
+
 	raw, err := ioutil.ReadFile(path)
 	if err != nil {
 		log.Panic(err)
@@ -222,4 +232,12 @@ func insertTransaction(t, pair string, price, quantity float64) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func createSignature(message string, secret string) string {
+	key := []byte(secret)
+	h := hmac.New(sha256.New, key)
+	h.Write([]byte(message))
+	d := hex.EncodeToString(h.Sum(nil))
+	return strings.ToUpper(d)
 }
