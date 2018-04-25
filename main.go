@@ -34,12 +34,20 @@ func main() {
 	// Enable paper trading.
 	bot.simulation = true
 
-	// Create and open SQLite3 database file.
+	// Create and open PostgreSQL database file.
 	var err error
-	connStr := "postgres://trader:trader@localhost/trader?sslmode=disable"
-	bot.db, err = sql.Open("postgres", connStr)
-	if err != nil {
-		e.Logger.Fatal(err)
+	if len(os.Getenv("T_PROD")) > 0 {
+		connStr := "postgres://trader:trader@tradebot.c7hp5txgl9gh.ap-southeast-1.rds.amazonaws.com/trader?sslmode=disable"
+		bot.db, err = sql.Open("postgres", connStr)
+		if err != nil {
+			e.Logger.Fatal(err)
+		}
+	} else {
+		connStr := "postgres://trader:trader@localhost/trader?sslmode=disable"
+		bot.db, err = sql.Open("postgres", connStr)
+		if err != nil {
+			e.Logger.Fatal(err)
+		}
 	}
 	defer bot.db.Close()
 
@@ -77,7 +85,7 @@ func main() {
 	loadRoutes(e)
 
 	//go socketCheckBalance()
-	//go pollTicker()
+	go pollTicker()
 
 	if port, ok := os.LookupEnv("PORT"); ok {
 		e.Logger.Fatal(e.Start(":" + port))

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/labstack/echo"
 )
@@ -22,16 +22,17 @@ func portfolioAddNewAccount(c echo.Context) error {
 	secret := c.FormValue("secret")
 
 	if exists := repoAccountExists(key); exists {
+		repoInsertNewLog(fmt.Sprintf("Account %s alreadly exists.", key))
 		return jsonBadRequest(c, "account already exists")
 	}
 
-	log.Print(key)
 	id, err := repoInsertNewAccount(key, secret)
 	if err != nil {
+		repoInsertNewLog(fmt.Sprintf("Can't create account %s.", key))
 		return jsonServerError(c, err)
 	}
-	log.Print("Hello")
 
+	repoInsertNewLog(fmt.Sprintf("Account %s created.", key))
 	return jsonSuccess(c, echo.Map{
 		"id": id,
 	})

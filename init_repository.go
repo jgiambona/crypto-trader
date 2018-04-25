@@ -14,9 +14,21 @@ type (
 )
 
 func repoCreateDB() error {
-	query := "CREATE TABLE IF NOT EXISTS accounts (id INTEGER NOT NULL PRIMARY KEY, apiKey TEXT, apiSecret TEXT)"
+	query := "CREATE TABLE IF NOT EXISTS accounts (id SERIAL PRIMARY KEY, apiKey TEXT, apiSecret TEXT)"
 
 	_, err := bot.db.Exec(query)
+	if err != nil {
+		return err
+	}
+
+	query = "CREATE TABLE IF NOT EXISTS logs (id SERIAL PRIMARY KEY, message TEXT)"
+
+	_, err = bot.db.Exec(query)
+	if err != nil {
+		return err
+	}
+
+	err = repoInsertNewLog("Sync database.")
 	if err != nil {
 		return err
 	}
@@ -55,22 +67,27 @@ func repoListAccounts() ([]Account, error) {
 	return list, nil
 }
 
-func repoInsertNewAccount(apiKey, apiSecret string) (int64, error) {
-	stmt, err := bot.db.Prepare("INSERT INTO accounts(apiKey, apiSecret) VALUES(?, ?)")
+func repoInsertNewLog(message string) error {
+	_, err := bot.db.Query(`INSERT INTO logs(message) VALUES($1)`, message)
 	if err != nil {
-		return -1, err
+		return err
 	}
 
-	var res sql.Result
+	log.Println("inserted new log")
+	return nil
+}
 
-	res, err = stmt.Exec(apiKey, apiSecret)
+func repoInsertNewAccount(apiKey, apiSecret string) (int64, error) {
+	var  accountID int64
+	err := bot.db.QueryRow(
+		`INSERT INTO accounts(apiKey, apiSecret) VALUES($1, $2) RETURNING id`,
+		apiKey, apiSecret).Scan(&accountID)
 	if err != nil {
 		return -1, err
 	}
 
 	bot.nextID += 1
-	log.Println("insert new account")
-	return res.LastInsertId()
+	return accountID, nil
 }
 
 func repoGetLastAccountID() (int64, error) {

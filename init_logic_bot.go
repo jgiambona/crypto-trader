@@ -13,3 +13,9 @@ func botRestart(c echo.Context) error {
 func botSuspend(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
+
+func botPaperTradeToggle(c echo.Context) error {
+	bot.simulation = !bot.simulation
+	return c.NoContent(http.StatusOK)
+}
+

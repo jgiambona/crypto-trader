@@ -11,3 +11,5 @@ func setup(c echo.Context) error {
 func setupPingpong(c echo.Context) error {
 	return jsonSuccess(c, echo.Map{})
 }
+
+

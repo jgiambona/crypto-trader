@@ -6,6 +6,7 @@ func loadRoutes(e *echo.Echo) {
 	e.Add("GET", "/", index)
 	e.Add("GET", "/bot/restart", botRestart)
 	e.Add("GET", "/bot/suspend", botSuspend)
+	e.Add("GET", "/bot/pt", botPaperTradeToggle)
 	e.Add("GET", "/bot/exchange/:name/info", exchangeGetConfigInfo)
 	e.Add("GET", "/bot/portfolios", portfolioList)
 

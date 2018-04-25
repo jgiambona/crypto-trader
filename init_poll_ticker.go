@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 	"sync"
 	"time"
@@ -85,7 +84,6 @@ func pollTicker() {
 					lastPairPrice = nextDataPoint.WeightedAverage
 				} else if simulation && (len(historicalData) < 1) {
 					log.Print("finish running historical data")
-					os.Exit(0)
 				} else {
 					values := c.UpdateTicker()
 					lastPairPrice = values["close"].(float64)
