@@ -8,22 +8,10 @@ services:
       - "127.0.0.1:8086:8086"
     volumes:
       - "$PWD/var/lib/influxdb:/var/lib/influxdb"
-  postgres:
-    image: postgres:10.3-alpine
-    environment:
-      - POSTGRES_USER=trader
-      - POSTGRES_DB=trader
-      - POSTGRES_PASSWORD=trader
-    ports:
-      - "127.0.0.1:5432:5432"
-    volumes:
-      - "$PWD/var/lib/postgresql:/var/lib/postgresql"
   grafana:
     image: grafana/grafana:5.0.4
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=trader
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_ANONYMOUS_ORG_NAME=Anonymous
     ports:
       - "127.0.0.1:3000:3000"
     volumes:

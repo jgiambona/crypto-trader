@@ -2,12 +2,14 @@ package main
 
 import "github.com/labstack/echo"
 
-type Configuration struct {
+type RuleConfiguration struct {
+	ID                    int64
 	Interval              int64
 	MaximumVolume         int64
 	TransactionVolume     int64
 	VarianceOfTransaction float64
 	BidPriceStepDown      float64
+	Enabled               bool
 }
 
 func updateSettings(c echo.Context) error {

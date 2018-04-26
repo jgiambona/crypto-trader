@@ -28,8 +28,8 @@ func (e *LiveCoin) GetOrder(params echo.Map) {
 }
 
 // GetBalances - Returns an array of your balances. There are four types of
-// balances for every currency: totaltotal, funds available for trading,
-// funds in open orders , funds available for withdrawal.
+// balances for every currency: total, funds available for trading,
+// funds in open orders, funds available for withdrawal.
 func (e *LiveCoin) GetBalances(currency string) {
 	path := fmt.Sprintf("%s/payment/balances", LiveCoinAPIURL)
 	e.SendPayload("GET", path, nil, nil, nil)
