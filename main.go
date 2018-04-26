@@ -1,8 +1,6 @@
 package main
 
 import (
-	"database/sql"
-	"log"
 	"os"
 
 	"github.com/ffimnsr/trader/exchange"
@@ -14,12 +12,8 @@ import (
 
 // Bot is the singleton that holds all the data.
 type Bot struct {
-	config     *BotConfig
-	exchanges  []exchange.BotExchange
-	store      influx.Client
-	simulation bool
-	db         *sql.DB
-	nextID     int64
+	exchanges []exchange.BotExchange
+	store     influx.Client
 }
 
 var bot Bot
@@ -31,34 +25,6 @@ func main() {
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
 
-	// Enable paper trading.
-	bot.simulation = true
-
-	// Create and open PostgreSQL database file.
-	var err error
-	if len(os.Getenv("T_PROD")) > 0 {
-		connStr := "postgres://trader:trader@tradebot.c7hp5txgl9gh.ap-southeast-1.rds.amazonaws.com/trader?sslmode=disable"
-		bot.db, err = sql.Open("postgres", connStr)
-		if err != nil {
-			e.Logger.Fatal(err)
-		}
-	} else {
-		connStr := "postgres://trader:trader@localhost/trader?sslmode=disable"
-		bot.db, err = sql.Open("postgres", connStr)
-		if err != nil {
-			e.Logger.Fatal(err)
-		}
-	}
-	defer bot.db.Close()
-
-	if err := bot.db.Ping(); err != nil {
-		e.Logger.Fatal(err)
-	}
-
-	if err := repoCreateDB(); err != nil {
-		e.Logger.Fatal(err)
-	}
-
 	if len(os.Getenv("T_PROD")) > 0 {
 		bot.store, _ = influx.NewHTTPClient(influx.HTTPConfig{
 			Addr: "http://ec2-54-169-102-171.ap-southeast-1.compute.amazonaws.com:8086",
@@ -69,22 +35,8 @@ func main() {
 		})
 	}
 
-	id, err := repoGetLastAccountID()
-	if err != nil {
-		e.Logger.Fatal(err)
-	}
-	log.Printf("--- Number of Accounts: %d", id)
-	bot.nextID = id + 1
-
-	loadConfig()
-	loadExchanges()
-	if len(bot.exchanges) == 0 {
-		e.Logger.Fatal("no exchanges were loaded.")
-	}
-
 	loadRoutes(e)
 
-	//go socketCheckBalance()
 	go pollTicker()
 
 	if port, ok := os.LookupEnv("PORT"); ok {
@@ -94,3 +46,9 @@ func main() {
 	}
 }
 
+func loadRoutes(e *echo.Echo) {
+	e.Add("GET", "/", index)
+
+	e.Add("POST", "/bot/settings", index)
+	e.Add("POST", "/bot/accounts", index)
+}

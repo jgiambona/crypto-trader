@@ -32,7 +32,6 @@ go run main.go init_*.go
 
 Set the configuration `config.yaml` and restart.
 
-
 ~~~
 $ docker run --rm -it -v $PWD:/go/src/github.com/ffimnsr/trader -p 8000:8000 golang:1.10.1 bash
 > go get -u github.com/golang/dep/cmd/dep

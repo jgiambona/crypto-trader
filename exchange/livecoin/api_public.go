@@ -25,7 +25,7 @@ func (e *LiveCoin) GetTicker(currencyPair string) (TickerResponse, error) {
 func (e *LiveCoin) GetLastTrades(currencyPair, minutesOrHour, tradeType string) {
 	path := fmt.Sprintf("%s/exchange/last_trades", LiveCoinAPIURL)
 	if err := e.SendPayload("GET", path, nil, nil, nil); err != nil {
-		log.Fatalf("%s", err.Error())
+		log.Printf("%s", err.Error())
 	}
 }
 
