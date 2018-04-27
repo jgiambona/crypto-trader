@@ -49,6 +49,6 @@ func main() {
 func loadRoutes(e *echo.Echo) {
 	e.Add("GET", "/", index)
 
-	e.Add("POST", "/bot/settings", index)
-	e.Add("POST", "/bot/accounts", index)
+	e.Add("POST", "/bot/settings", updateSettings)
+	e.Add("POST", "/bot/accounts", updateSettings)
 }
