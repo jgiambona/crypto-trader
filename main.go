@@ -10,11 +10,22 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// Bot is the singleton that holds all the data.
-type Bot struct {
-	exchanges []exchange.BotExchange
-	store     influx.Client
-}
+
+type (
+	// ANR stands for Account and Rules.
+	ANR struct {
+		A Account
+		R RuleConfiguration
+	}
+
+	// Bot is the singleton that holds all the data.
+	Bot struct {
+		exchanges  []exchange.BotExchange
+		store      influx.Client
+		accountOne ANR
+		accountTwo ANR
+	}
+)
 
 var bot Bot
 
@@ -50,5 +61,5 @@ func loadRoutes(e *echo.Echo) {
 	e.Add("GET", "/", index)
 
 	e.Add("POST", "/bot/settings", updateSettings)
-	e.Add("POST", "/bot/accounts", updateSettings)
+	e.Add("POST", "/bot/accounts", updateAccounts)
 }

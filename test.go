@@ -82,3 +82,4 @@ func createSignature(message string, secret string) string {
 	d := hex.EncodeToString(h.Sum(nil))
 	return strings.ToUpper(d)
 }
+
