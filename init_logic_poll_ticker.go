@@ -13,7 +13,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ffimnsr/trader/exchange"
 	influx "github.com/influxdata/influxdb/client/v2"
 	"github.com/labstack/echo"
 )
@@ -29,75 +28,81 @@ type (
 		QuoteVolume     float64 `json:"quoteVolume"`
 		WeightedAverage float64 `json:"weightedAverage"`
 	}
-
-	// OrderResponse receives the order status.
-	OrderResponse struct {
-		Success bool  `json:"success"`
-		Added   bool  `json:"added"`
-		OrderID int64 `json:"orderId"`
-	}
 )
 
-// PollTicker fetches and updates the ticker for all exchanges.
 func pollTicker() {
 
 	var waitExchanges sync.WaitGroup
 
-	//pair := "btc_usd"
-	//quantity := 0.001
-	//simulationStart := false
-	//historicalData := []Period{}
-	//tradePlaced := false
-	//typeOfTrade := ""
-
-	// accountOne := true
-	// accountTwo := true
-
-	ruleOne := true
-	ruleTwo := true
+	currencyPair := "NOX/ETH"
+	quantity := 0.001
+	placedOrder := 0.001
 
 	for {
-		waitExchanges.Add(len(bot.exchanges))
-		for _, x := range bot.exchanges {
-			go func(c exchange.BotExchange) {
-				defer waitExchanges.Done()
+		waitExchanges.Add(1)
+		go func() {
+			defer waitExchanges.Done()
+			updateTicker(currencyPair)
 
-				// switchAccountRoles
+			tradePlace := false
+			switchAccountRoles()
 
-				tradeStop := false
+		repeatCheckLowestBid:
+			lowest := getLowestBidInQueue()
 
-				// repeatCheckLowestBid:
-				// lowest := getLowestBidInQueue()
-				// targetPrice := lowest - stepDownPrice
-				// if targetPrice >= rangePriceAndAmount
-				//   accountOnePlaceBidLowerThanInQueue
-
-				// lowest := getLowesetBidInQueue()
-				if ruleOne {
-					// if lowest == fromAccountOne
-					//   accountTwoBuyBid
-					//   tradeStop = true
+			if bot.ruleOne.Enabled {
+				targetPrice := lowest - bot.ruleOne.BidPriceStepDown
+				if targetPrice >= rangePriceAndAmount {
+					insertTransaction("SELL", "nox_eth", targetPrice, quantity)
+					placedOrder = 0.001
 				}
 
-				if ruleTwo && !tradeStop {
-					// if lowest != fromAccountOne
-					//   accountOneCancelBid
-					//   goto repeatCheckLowestBid
-					//
-					//
-					// if lowest == fromAccountOne
-					//   accountTwoBuyBid
+				if lowest == fromAccountOne {
+					insertTransaction("BUY", "nox_eth", targetPrice, quantity)
+					buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
+						currencyPair, targetPrice, quantity)
+					tradePlace = true
+				}
+			}
+
+			if bot.ruleTwo.Enabled && !tradePlace {
+				targetPrice := lowest - bot.ruleTwo.BidPriceStepDown
+				if targetPrice >= rangePriceAndAmount {
+					insertTransaction("SELL", "nox_eth", targetPrice, quantity)
+					sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
+						currencyPair, targetPrice, quantity)
+					placedOrder = 0.001
 				}
 
-				//var lastPairPrice float64
-				//values := c.UpdateTicker()
-				//lastPairPrice = values["close"].(float64)
-			}(x)
-		}
+				if lowest != fromAccountOne {
+					insertTransaction("CANCEL", "nox_eth", targetPrice, quantity)
+					cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
+						currencyPair, placedOrder)
+					goto repeatCheckLowestBid
+				}
+
+				if lowest == fromAccountOne {
+					insertTransaction("BUY", "nox_eth", targetPrice, quantity)
+					buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
+						currencyPair, targetPrice, quantity)
+				}
+			}
+		}()
 
 		waitExchanges.Wait()
 		time.Sleep(7 * time.Second)
 	}
+}
+
+func switchAccountRoles() (err error) {
+
+	swap := false
+	if swap {
+		tmp := bot.accountOne
+		bot.accountOne = bot.accountTwo
+		bot.accountTwo = tmp
+	}
+	return nil
 }
 
 func sum(c []float64) float64 {
@@ -168,6 +173,55 @@ func insertTransaction(t, pair string, price, quantity float64) {
 	}
 }
 
+func updateTicker(pair string) echo.Map {
+	p, err := getTicker(pair)
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	bp, err := influx.NewBatchPoints(influx.BatchPointsConfig{
+		Database:  "trader",
+		Precision: "s",
+	})
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	tags := map[string]string{
+		"type":     "ticker",
+		"pair":     "nox_eth",
+		"exchange": "livecoin",
+	}
+	fields := echo.Map{
+		"symbol":        p.Currency,
+		"high":          p.High,
+		"low":           p.Low,
+		"volume":        p.Volume,
+		"ask":           p.BestAsk,
+		"askVolume":     -1,
+		"bid":           p.BestBid,
+		"bidVolume":     -1,
+		"vwap":          p.Vwap,
+		"open":          -1,
+		"close":         p.Last,
+		"previousClose": -1,
+		"change":        -1,
+		"percentage":    -1,
+		"average":       -1,
+		"baseVolume":    p.Volume,
+		"quoteVolume":   p.Volume * p.Vwap,
+	}
+
+	pt, err := influx.NewPoint("stream", tags, fields, time.Now())
+	bp.AddPoint(pt)
+	err = bot.store.Write(bp)
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	return fields
+}
+
 func insertTickerUpdate(p *Period) echo.Map {
 	bp, err := influx.NewBatchPoints(influx.BatchPointsConfig{
 		Database:  "trader",
@@ -219,4 +273,3 @@ func createSignature(message string, secret string) string {
 	d := hex.EncodeToString(h.Sum(nil))
 	return strings.ToUpper(d)
 }
-

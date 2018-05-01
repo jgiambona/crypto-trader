@@ -28,11 +28,11 @@ type (
 func updateAccounts(c echo.Context) error {
 	id, _ := strconv.ParseInt(c.FormValue("id"), 10, 64)
 	if id == 1 {
-		bot.accountOne.A.APIKey = c.FormValue("key")
-		bot.accountOne.A.APISecret = c.FormValue("secret")
+		bot.accountOne.APIKey = c.FormValue("key")
+		bot.accountOne.APISecret = c.FormValue("secret")
 	} else if id == 2 {
-		bot.accountTwo.A.APIKey = c.FormValue("key")
-		bot.accountTwo.A.APISecret = c.FormValue("secret")
+		bot.accountTwo.APIKey = c.FormValue("key")
+		bot.accountTwo.APISecret = c.FormValue("secret")
 	} else {
 		return jsonBadRequest(c, "error no such account.")
 	}
@@ -44,29 +44,29 @@ func updateAccounts(c echo.Context) error {
 
 func updateSettings(c echo.Context) error {
 	id, _ := strconv.ParseInt(c.FormValue("id"), 10, 64)
-	interval := c.FormValue("interval")
-	maximumVolume := c.FormValue("maximumVolume")
-	transactionVolume := c.FormValue("transactionVolume")
-	variance := c.FormValue("variance")
-	stepDownPrice := c.FormValue("stepDownPrice")
-	minimumBid := c.FormValue("minimumBid")
+	interval, _ := strconv.ParseInt(c.FormValue("interval"), 10, 64)
+	maximumVolume, _ := strconv.ParseInt(c.FormValue("maximumVolume"), 10, 64)
+	transactionVolume, _ := strconv.ParseInt(c.FormValue("transactionVolume"), 10, 64)
+	variance, _ := strconv.ParseFloat(c.FormValue("variance"), 64)
+	stepDownPrice, _ := strconv.ParseFloat(c.FormValue("stepDownPrice"), 64)
+	minimumBid, _ := strconv.ParseFloat(c.FormValue("minimumBid"), 64)
 
 	if id == 1 {
-		bot.accountOne.R.Enabled = true
-		bot.accountOne.R.Interval = interval
-		bot.accountOne.R.MaximumVolume = maximumVolume
-		bot.accountOne.R.TransactionVolume = transactionVolume
-		bot.accountOne.R.VarianceOfTransaction = variance
-		bot.accountOne.R.BidPriceStepDown = stepDownPrice
-		bot.accountOne.R.MinimumBid = minimumBid
+		bot.ruleOne.Enabled = true
+		bot.ruleOne.Interval = interval
+		bot.ruleOne.MaximumVolume = maximumVolume
+		bot.ruleOne.TransactionVolume = transactionVolume
+		bot.ruleOne.VarianceOfTransaction = variance
+		bot.ruleOne.BidPriceStepDown = stepDownPrice
+		bot.ruleOne.MinimumBid = minimumBid
 	} else if id == 2 {
-		bot.accountTwo.R.Enabled = true
-		bot.accountTwo.R.Interval = interval
-		bot.accountTwo.R.MaximumVolume = maximumVolume
-		bot.accountTwo.R.TransactionVolume = transactionVolume
-		bot.accountTwo.R.VarianceOfTransaction = variance
-		bot.accountTwo.R.BidPriceStepDown = stepDownPrice
-		bot.accountTwo.R.MinimumBid = minimumBid
+		bot.ruleTwo.Enabled = true
+		bot.ruleTwo.Interval = interval
+		bot.ruleTwo.MaximumVolume = maximumVolume
+		bot.ruleTwo.TransactionVolume = transactionVolume
+		bot.ruleTwo.VarianceOfTransaction = variance
+		bot.ruleTwo.BidPriceStepDown = stepDownPrice
+		bot.ruleTwo.MinimumBid = minimumBid
 	} else {
 		return jsonBadRequest(c, "error no such account.")
 	}

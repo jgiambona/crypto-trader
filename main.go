@@ -2,28 +2,24 @@ package main
 
 import (
 	"os"
+	"strings"
 
-	"github.com/ffimnsr/trader/exchange"
 	influx "github.com/influxdata/influxdb/client/v2"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	_ "github.com/lib/pq"
 )
 
-
 type (
-	// ANR stands for Account and Rules.
-	ANR struct {
-		A Account
-		R RuleConfiguration
-	}
-
 	// Bot is the singleton that holds all the data.
 	Bot struct {
-		exchanges  []exchange.BotExchange
-		store      influx.Client
-		accountOne ANR
-		accountTwo ANR
+		store                  influx.Client
+		accountOne             Account
+		accountTwo             Account
+		ruleOne                RuleConfiguration
+		ruleTwo                RuleConfiguration
+		availableCurrencyPairs []string
+		baseCurrencies         []string
 	}
 )
 
@@ -45,6 +41,9 @@ func main() {
 			Addr: "http://localhost:8086",
 		})
 	}
+
+	bot.availableCurrencyPairs = strings.Fields(CurrencyPairAllowed)
+	bot.baseCurrencies = strings.Fields(CurrencyAllowed)
 
 	loadRoutes(e)
 
