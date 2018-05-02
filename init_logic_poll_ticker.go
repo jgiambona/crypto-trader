@@ -35,8 +35,8 @@ func pollTicker() {
 	var waitExchanges sync.WaitGroup
 
 	currencyPair := "NOX/ETH"
-	quantity := 0.001
-	placedOrder := 0.001
+	//quantity := 0.001
+	//placedOrder := 0.001
 
 	for {
 		waitExchanges.Add(1)
@@ -44,49 +44,49 @@ func pollTicker() {
 			defer waitExchanges.Done()
 			updateTicker(currencyPair)
 
-			tradePlace := false
+			//tradePlace := false
 			switchAccountRoles()
 
-		repeatCheckLowestBid:
-			lowest := getLowestBidInQueue()
-
-			if bot.ruleOne.Enabled {
-				targetPrice := lowest - bot.ruleOne.BidPriceStepDown
-				if targetPrice >= rangePriceAndAmount {
-					insertTransaction("SELL", "nox_eth", targetPrice, quantity)
-					placedOrder = 0.001
-				}
-
-				if lowest == fromAccountOne {
-					insertTransaction("BUY", "nox_eth", targetPrice, quantity)
-					buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
-						currencyPair, targetPrice, quantity)
-					tradePlace = true
-				}
-			}
-
-			if bot.ruleTwo.Enabled && !tradePlace {
-				targetPrice := lowest - bot.ruleTwo.BidPriceStepDown
-				if targetPrice >= rangePriceAndAmount {
-					insertTransaction("SELL", "nox_eth", targetPrice, quantity)
-					sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
-						currencyPair, targetPrice, quantity)
-					placedOrder = 0.001
-				}
-
-				if lowest != fromAccountOne {
-					insertTransaction("CANCEL", "nox_eth", targetPrice, quantity)
-					cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
-						currencyPair, placedOrder)
-					goto repeatCheckLowestBid
-				}
-
-				if lowest == fromAccountOne {
-					insertTransaction("BUY", "nox_eth", targetPrice, quantity)
-					buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
-						currencyPair, targetPrice, quantity)
-				}
-			}
+//		repeatCheckLowestBid:
+//			lowest := getLowestBidInQueue()
+//
+//			if bot.ruleOne.Enabled {
+//				targetPrice := lowest - bot.ruleOne.BidPriceStepDown
+//				if targetPrice >= rangePriceAndAmount {
+//					insertTransaction("SELL", "nox_eth", targetPrice, quantity)
+//					placedOrder = 0.001
+//				}
+//
+//				if lowest == fromAccountOne {
+//					insertTransaction("BUY", "nox_eth", targetPrice, quantity)
+//					buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
+//						currencyPair, targetPrice, quantity)
+//					tradePlace = true
+//				}
+//			}
+//
+//			if bot.ruleTwo.Enabled && !tradePlace {
+//				targetPrice := lowest - bot.ruleTwo.BidPriceStepDown
+//				if targetPrice >= rangePriceAndAmount {
+//					insertTransaction("SELL", "nox_eth", targetPrice, quantity)
+//					sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
+//						currencyPair, targetPrice, quantity)
+//					placedOrder = 0.001
+//				}
+//
+//				if lowest != fromAccountOne {
+//					insertTransaction("CANCEL", "nox_eth", targetPrice, quantity)
+//					cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
+//						currencyPair, placedOrder)
+//					goto repeatCheckLowestBid
+//				}
+//
+//				if lowest == fromAccountOne {
+//					insertTransaction("BUY", "nox_eth", targetPrice, quantity)
+//					buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
+//						currencyPair, targetPrice, quantity)
+//				}
+//			}
 		}()
 
 		waitExchanges.Wait()
