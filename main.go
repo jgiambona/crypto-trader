@@ -47,6 +47,8 @@ func main() {
 	bot.availableCurrencyPairs = strings.Fields(CurrencyPairAllowed)
 	bot.baseCurrencies = strings.Fields(CurrencyAllowed)
 
+	bot.accountOne.APIKey = "bot"
+	bot.accountTwo.APIKey = "bot"
 	bot.ruleOne.Enabled = true
 	bot.ruleOne.Interval = 7
 	bot.ruleOne.MaximumVolume = 50000.0

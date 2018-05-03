@@ -62,26 +62,28 @@ func pollTicker() {
 						v := bot.ruleOne.TransactionVolume * 0.10
 						quantity := bot.ruleOne.TransactionVolume + getRandom(v)
 						targetPrice := lowest - bot.ruleOne.BidPriceStepDown
-						if volume < bot.ruleOne.MaximumVolume {
-							insertTransaction("SELL", "nox_eth", targetPrice, quantity)
-							if !simulate {
-								o, err := sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
-									currencyPair, targetPrice, quantity)
-								if err != nil {
-									log.Print("error occurred in creating sell order")
+						if lowest >= bot.ruleOne.MinimumBid {
+							if volume < bot.ruleOne.MaximumVolume {
+								insertTransaction("SELL", "nox_eth", targetPrice, quantity)
+								if !simulate {
+									o, err := sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
+										currencyPair, targetPrice, quantity)
+									if err != nil {
+										log.Print("error occurred in creating sell order")
+									}
+									placedOrder = o.OrderID
 								}
-								placedOrder = o.OrderID
+								fromAccountOne = targetPrice
 							}
-							fromAccountOne = targetPrice
-						}
 
-						if lowest >= fromAccountOne {
-							insertTransaction("BUY", "nox_eth", targetPrice, quantity)
-							if !simulate {
-								buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
-									currencyPair, targetPrice, quantity)
+							if lowest >= fromAccountOne {
+								insertTransaction("BUY", "nox_eth", targetPrice, quantity)
+								if !simulate {
+									buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
+										currencyPair, targetPrice, quantity)
+								}
+								tradePlace = true
 							}
-							tradePlace = true
 						}
 					}
 
@@ -89,42 +91,44 @@ func pollTicker() {
 						v := bot.ruleOne.TransactionVolume * 0.10
 						quantity := bot.ruleOne.TransactionVolume + getRandom(v)
 						targetPrice := lowest - bot.ruleTwo.BidPriceStepDown
-						if volume < bot.ruleTwo.MaximumVolume {
-							insertTransaction("SELL", "nox_eth", targetPrice, quantity)
-							if simulate {
-								o, err := sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
-									currencyPair, targetPrice, quantity)
-								if err != nil {
-									log.Print("error occurred in creating sell order")
+						if lowest >= bot.ruleTwo.MinimumBid {
+							if volume < bot.ruleTwo.MaximumVolume {
+								insertTransaction("SELL", "nox_eth", targetPrice, quantity)
+								if simulate {
+									o, err := sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
+										currencyPair, targetPrice, quantity)
+									if err != nil {
+										log.Print("error occurred in creating sell order")
+									}
+									placedOrder = o.OrderID
 								}
-								placedOrder = o.OrderID
+								fromAccountOne = targetPrice
+								tradePlace = true
 							}
-							fromAccountOne = targetPrice
-							tradePlace = true
-						}
 
-						if lowest != fromAccountOne {
-							insertTransaction("CANCEL", "nox_eth", targetPrice, quantity)
-							if simulate {
-								c, err := cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
-									currencyPair, placedOrder)
+							if lowest != fromAccountOne {
+								insertTransaction("CANCEL", "nox_eth", targetPrice, quantity)
+								if simulate {
+									c, err := cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
+										currencyPair, placedOrder)
 
-								if err != nil {
-									log.Print("error occurred in cancelling order")
+									if err != nil {
+										log.Print("error occurred in cancelling order")
+									}
+
+									if !c.Success {
+										log.Print("unable to cancel order")
+									}
 								}
-
-								if !c.Success {
-									log.Print("unable to cancel order")
-								}
+								goto repeatCheckLowestBid
 							}
-							goto repeatCheckLowestBid
-						}
 
-						if lowest >= fromAccountOne {
-							insertTransaction("BUY", "nox_eth", targetPrice, quantity)
-							if simulate {
-								buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
-									currencyPair, targetPrice, quantity)
+							if lowest >= fromAccountOne {
+								insertTransaction("BUY", "nox_eth", targetPrice, quantity)
+								if simulate {
+									buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
+										currencyPair, targetPrice, quantity)
+								}
 							}
 						}
 					}
@@ -360,5 +364,5 @@ func getRandom(v float64) float64 {
 	value := int64(v)
 	r := rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
 	ir := IntRange{-value, value}
-	return float64(ir.NextRandom(r))
+	return float64(ir.NextRandom(r) + r.Float64())
 }
