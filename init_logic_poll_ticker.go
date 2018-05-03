@@ -63,7 +63,7 @@ func pollTicker() {
 						targetPrice := lowest - bot.ruleOne.BidPriceStepDown
 						if lowest >= bot.ruleOne.MinimumBid {
 							if volume < bot.ruleOne.MaximumVolume {
-								insertTransaction("SELL", "nox_eth", targetPrice, quantity)
+								go insertTransaction("SELL", "nox_eth", targetPrice, quantity)
 								if !simulate {
 									o, err := sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
 										currencyPair, targetPrice, quantity)
@@ -76,7 +76,7 @@ func pollTicker() {
 							}
 
 							if lowest >= fromAccountOne {
-								insertTransaction("BUY", "nox_eth", targetPrice, quantity)
+								go insertTransaction("BUY", "nox_eth", targetPrice, quantity)
 								if !simulate {
 									buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
 										currencyPair, targetPrice, quantity)
@@ -92,7 +92,7 @@ func pollTicker() {
 						targetPrice := lowest - bot.ruleTwo.BidPriceStepDown
 						if lowest >= bot.ruleTwo.MinimumBid {
 							if volume < bot.ruleTwo.MaximumVolume {
-								insertTransaction("SELL", "nox_eth", targetPrice, quantity)
+								go insertTransaction("SELL", "nox_eth", targetPrice, quantity)
 								if simulate {
 									o, err := sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
 										currencyPair, targetPrice, quantity)
@@ -106,7 +106,7 @@ func pollTicker() {
 							}
 
 							if lowest != fromAccountOne {
-								insertTransaction("CANCEL", "nox_eth", targetPrice, quantity)
+								go insertTransaction("CANCEL", "nox_eth", targetPrice, quantity)
 								if simulate {
 									c, err := cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
 										currencyPair, placedOrder)
@@ -123,7 +123,7 @@ func pollTicker() {
 							}
 
 							if lowest >= fromAccountOne {
-								insertTransaction("BUY", "nox_eth", targetPrice, quantity)
+								go insertTransaction("BUY", "nox_eth", targetPrice, quantity)
 								if simulate {
 									buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
 										currencyPair, targetPrice, quantity)
