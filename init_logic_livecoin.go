@@ -50,6 +50,30 @@ func getFee(maker bool) float64 {
 	return 0.18 / 100
 }
 
+// Returns actual trading fee.
+func getCommission(apiKey, apiSecret string) (struct {
+	Success bool
+	Fee float64
+	}, error){
+	path := fmt.Sprintf("%s/exchange/commission", LiveCoinAPIURL)
+
+	construct := url.Values{}
+	message := construct.Encode()
+
+	headers := map[string]string{
+		"API-Key":        apiKey,
+		"Sign":           createSignature(message, apiSecret),
+		"Content-Type":   "application/x-www-form-urlencoded",
+		"Content-Length": strconv.Itoa(len(message)),
+	}
+
+	data := struct {
+		Success bool
+		Fee     float64
+	}{}
+	return data, sendPayload("GET", path, headers, strings.NewReader(message), &data)
+}
+
 // Get information on all currency pair for the last 24 hours.
 func getTickerAll() (TickerResponse, error) {
 	result := TickerResponse{}
@@ -197,10 +221,10 @@ func sellMarket(apiKey, apiSecret, currencyPair string, quantity float64) (Order
 }
 
 // Cancel order.
-func cancelLimit(apiKey, apiSecret, currencyPair string, orderID float64) (CancelOrderResponse, error) {
+func cancelLimit(apiKey, apiSecret, currencyPair string, orderID int64) (CancelOrderResponse, error) {
 	path := fmt.Sprintf("%s/exchange/cancellimit", LiveCoinAPIURL)
 
-	o := strconv.FormatFloat(orderID, 'f', 8, 64)
+	o := strconv.FormatInt(orderID, 10)
 	construct := url.Values{}
 	construct.Add("currencyPair", currencyPair)
 	construct.Add("orderId", o)

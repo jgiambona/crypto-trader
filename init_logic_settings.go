@@ -16,14 +16,28 @@ type (
 	RuleConfiguration struct {
 		ID                    int64
 		Interval              int64
-		MaximumVolume         int64
-		TransactionVolume     int64
+		MaximumVolume         float64
+		TransactionVolume     float64
 		VarianceOfTransaction float64
 		BidPriceStepDown      float64
 		MinimumBid            float64
 		Enabled               bool
 	}
 )
+
+func botControls(c echo.Context) error {
+	power, err := strconv.ParseInt(c.FormValue("power"), 10, 64)
+	if err != nil {
+		jsonBadRequest(c, err)
+	}
+
+	if power == 1 {
+		bot.running = true
+	} else {
+		bot.running = false
+	}
+	return jsonSuccess(c, echo.Map{})
+}
 
 func updateAccounts(c echo.Context) error {
 	id, _ := strconv.ParseInt(c.FormValue("id"), 10, 64)
@@ -45,8 +59,8 @@ func updateAccounts(c echo.Context) error {
 func updateSettings(c echo.Context) error {
 	id, _ := strconv.ParseInt(c.FormValue("id"), 10, 64)
 	interval, _ := strconv.ParseInt(c.FormValue("interval"), 10, 64)
-	maximumVolume, _ := strconv.ParseInt(c.FormValue("maximumVolume"), 10, 64)
-	transactionVolume, _ := strconv.ParseInt(c.FormValue("transactionVolume"), 10, 64)
+	maximumVolume, _ := strconv.ParseFloat(c.FormValue("maximumVolume"), 64)
+	transactionVolume, _ := strconv.ParseFloat(c.FormValue("transactionVolume"), 64)
 	variance, _ := strconv.ParseFloat(c.FormValue("variance"), 64)
 	stepDownPrice, _ := strconv.ParseFloat(c.FormValue("stepDownPrice"), 64)
 	minimumBid, _ := strconv.ParseFloat(c.FormValue("minimumBid"), 64)

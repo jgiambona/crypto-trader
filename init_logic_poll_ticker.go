@@ -31,71 +31,107 @@ type (
 )
 
 func pollTicker() {
-
 	var waitExchanges sync.WaitGroup
 
 	currencyPair := "NOX/ETH"
-	//quantity := 0.001
-	//placedOrder := 0.001
+	quantity := 0.001
+
+	simulate := true
+
+	var placedOrder int64
+	var fromAccountOne float64
 
 	for {
 		waitExchanges.Add(1)
 		go func() {
 			defer waitExchanges.Done()
-			updateTicker(currencyPair)
 
-			//tradePlace := false
-			switchAccountRoles()
+		repeatCheckLowestBid:
+			if bot.running {
+				if len(bot.accountOne.APIKey) > 0 && len(bot.accountTwo.APIKey) > 0 {
+					switchAccountRoles()
+					tradePlace := false
 
-//		repeatCheckLowestBid:
-//			lowest := getLowestBidInQueue()
-//
-//			if bot.ruleOne.Enabled {
-//				targetPrice := lowest - bot.ruleOne.BidPriceStepDown
-//				if targetPrice >= rangePriceAndAmount {
-//					insertTransaction("SELL", "nox_eth", targetPrice, quantity)
-//					placedOrder = 0.001
-//				}
-//
-//				if lowest == fromAccountOne {
-//					insertTransaction("BUY", "nox_eth", targetPrice, quantity)
-//					buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
-//						currencyPair, targetPrice, quantity)
-//					tradePlace = true
-//				}
-//			}
-//
-//			if bot.ruleTwo.Enabled && !tradePlace {
-//				targetPrice := lowest - bot.ruleTwo.BidPriceStepDown
-//				if targetPrice >= rangePriceAndAmount {
-//					insertTransaction("SELL", "nox_eth", targetPrice, quantity)
-//					sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
-//						currencyPair, targetPrice, quantity)
-//					placedOrder = 0.001
-//				}
-//
-//				if lowest != fromAccountOne {
-//					insertTransaction("CANCEL", "nox_eth", targetPrice, quantity)
-//					cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
-//						currencyPair, placedOrder)
-//					goto repeatCheckLowestBid
-//				}
-//
-//				if lowest == fromAccountOne {
-//					insertTransaction("BUY", "nox_eth", targetPrice, quantity)
-//					buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
-//						currencyPair, targetPrice, quantity)
-//				}
-//			}
+					p := updateTicker(currencyPair)
+					lowest := p["bid"].(float64)
+					volume := p["volume"].(float64)
+
+					if bot.ruleOne.Enabled {
+						targetPrice := lowest - bot.ruleOne.BidPriceStepDown
+						if volume < bot.ruleOne.MaximumVolume {
+							insertTransaction("SELL", "nox_eth", targetPrice, quantity)
+							if !simulate {
+								o, err := sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
+									currencyPair, targetPrice, quantity)
+								if err != nil {
+									log.Print("error occurred in creating sell order")
+								}
+								placedOrder = o.OrderID
+							}
+							fromAccountOne = targetPrice
+						}
+
+						if lowest >= fromAccountOne {
+							insertTransaction("BUY", "nox_eth", targetPrice, quantity)
+							if !simulate {
+								buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
+									currencyPair, targetPrice, quantity)
+							}
+							tradePlace = true
+						}
+					}
+
+					if bot.ruleTwo.Enabled && !tradePlace {
+						targetPrice := lowest - bot.ruleTwo.BidPriceStepDown
+						if volume < bot.ruleTwo.MaximumVolume {
+							insertTransaction("SELL", "nox_eth", targetPrice, quantity)
+							if simulate {
+								o, err := sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
+									currencyPair, targetPrice, quantity)
+								if err != nil {
+									log.Print("error occurred in creating sell order")
+								}
+								placedOrder = o.OrderID
+							}
+							fromAccountOne = targetPrice
+							tradePlace = true
+						}
+
+						if lowest != fromAccountOne {
+							insertTransaction("CANCEL", "nox_eth", targetPrice, quantity)
+							if simulate {
+								c, err := cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
+									currencyPair, placedOrder)
+
+								if err != nil {
+									log.Print("error occurred in cancelling order")
+								}
+
+								if !c.Success {
+									log.Print("unable to cancel order")
+								}
+							}
+							goto repeatCheckLowestBid
+						}
+
+						if lowest >= fromAccountOne {
+							insertTransaction("BUY", "nox_eth", targetPrice, quantity)
+							if simulate {
+								buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
+									currencyPair, targetPrice, quantity)
+							}
+						}
+					}
+				}
+			}
 		}()
 
 		waitExchanges.Wait()
-		time.Sleep(7 * time.Second)
+		time.Sleep(10 * time.Second)
 	}
 }
 
 func switchAccountRoles() (err error) {
-
 	swap := false
 	if swap {
 		tmp := bot.accountOne
@@ -150,6 +186,8 @@ func insertTransaction(t, pair string, price, quantity float64) {
 		log.Println(err)
 	}
 
+	log.Printf("-- %s %s", t, pair)
+
 	tags := map[string]string{
 		"exchange": "livecoin",
 		"pair":     pair,
@@ -192,6 +230,7 @@ func updateTicker(pair string) echo.Map {
 		"pair":     "nox_eth",
 		"exchange": "livecoin",
 	}
+
 	fields := echo.Map{
 		"symbol":        p.Currency,
 		"high":          p.High,

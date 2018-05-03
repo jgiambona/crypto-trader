@@ -18,6 +18,7 @@ type (
 		accountTwo             Account
 		ruleOne                RuleConfiguration
 		ruleTwo                RuleConfiguration
+		running                bool
 		availableCurrencyPairs []string
 		baseCurrencies         []string
 	}
@@ -42,6 +43,7 @@ func main() {
 		})
 	}
 
+	bot.running = false
 	bot.availableCurrencyPairs = strings.Fields(CurrencyPairAllowed)
 	bot.baseCurrencies = strings.Fields(CurrencyAllowed)
 
@@ -59,6 +61,7 @@ func main() {
 func loadRoutes(e *echo.Echo) {
 	e.Add("GET", "/", index)
 
+	e.Add("POST", "/bot/controls", botControls)
 	e.Add("POST", "/bot/settings", updateSettings)
 	e.Add("POST", "/bot/accounts", updateAccounts)
 }
