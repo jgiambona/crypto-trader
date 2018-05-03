@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -52,6 +53,18 @@ func updateAccounts(c echo.Context) error {
 	} else {
 		return jsonBadRequest(c, "error no such account.")
 	}
+
+	log.Printf(`
+	----- One
+	--- %s
+	--- %s
+	----- Two
+	--- %s
+	--- %s
+	----- End`,
+		bot.accountOne.APIKey, bot.accountOne.APISecret,
+		bot.accountTwo.APIKey, bot.accountTwo.APISecret)
+
 	return jsonSuccess(c, echo.Map{
 		"account": id,
 		"key":     c.FormValue("key"),
@@ -86,6 +99,29 @@ func updateSettings(c echo.Context) error {
 	} else {
 		return jsonBadRequest(c, "error no such account.")
 	}
+
+	log.Printf(`
+	----- One
+	--- %d
+	--- %.8f
+	--- %.8f
+	--- %.8f
+	--- %.8f
+	--- %.8f
+	----- Two
+	--- %d
+	--- %.8f
+	--- %.8f
+	--- %.8f
+	--- %.8f
+	--- %.8f
+	----- End`,
+		bot.ruleOne.Interval, bot.ruleOne.MaximumVolume, bot.ruleOne.TransactionVolume,
+		bot.ruleOne.VarianceOfTransaction, bot.ruleOne.BidPriceStepDown,
+		bot.ruleOne.MinimumBid,
+		bot.ruleTwo.Interval, bot.ruleTwo.MaximumVolume, bot.ruleTwo.TransactionVolume,
+		bot.ruleTwo.VarianceOfTransaction, bot.ruleTwo.BidPriceStepDown,
+		bot.ruleTwo.MinimumBid)
 
 	return jsonSuccess(c, echo.Map{
 		"account": id,
