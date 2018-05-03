@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo"
 )
@@ -16,7 +17,7 @@ type (
 
 	RuleConfiguration struct {
 		ID                    int64
-		Interval              int64
+		Interval              time.Duration
 		MaximumVolume         float64
 		TransactionVolume     float64
 		VarianceOfTransaction float64
@@ -73,12 +74,29 @@ func updateAccounts(c echo.Context) error {
 
 func updateSettings(c echo.Context) error {
 	id, _ := strconv.ParseInt(c.FormValue("id"), 10, 64)
-	interval, _ := strconv.ParseInt(c.FormValue("interval"), 10, 64)
 	maximumVolume, _ := strconv.ParseFloat(c.FormValue("maximumVolume"), 64)
 	transactionVolume, _ := strconv.ParseFloat(c.FormValue("transactionVolume"), 64)
 	variance, _ := strconv.ParseFloat(c.FormValue("variance"), 64)
 	stepDownPrice, _ := strconv.ParseFloat(c.FormValue("stepDownPrice"), 64)
 	minimumBid, _ := strconv.ParseFloat(c.FormValue("minimumBid"), 64)
+
+	intervalRune := []rune(c.FormValue("interval"))
+	log.Print(c.FormValue("interval"))
+
+	in, _ := strconv.ParseInt(string(intervalRune[0:len(intervalRune)-1]), 10, 64)
+	interval := time.Duration(in)
+	switch intervalRune[len(intervalRune)-1] {
+	case 'd':
+		interval *= (time.Hour * 24)
+	case 'h':
+		interval *= time.Hour
+	case 'm':
+		interval *= time.Minute
+	case 's':
+	default:
+		interval *= time.Second
+	}
+	log.Print(interval)
 
 	if id == 1 {
 		bot.ruleOne.Enabled = true

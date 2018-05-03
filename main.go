@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"strings"
+	"time"
 
 	influx "github.com/influxdata/influxdb/client/v2"
 	"github.com/labstack/echo"
@@ -50,7 +51,7 @@ func main() {
 	bot.accountOne.APIKey = "bot"
 	bot.accountTwo.APIKey = "bot"
 	bot.ruleOne.Enabled = true
-	bot.ruleOne.Interval = 7
+	bot.ruleOne.Interval = time.Duration(7 * time.Second)
 	bot.ruleOne.MaximumVolume = 50000.0
 	bot.ruleOne.TransactionVolume = 3000.0
 	bot.ruleOne.VarianceOfTransaction = 10.0
@@ -58,7 +59,7 @@ func main() {
 	bot.ruleOne.MinimumBid = 0.00001
 
 	bot.ruleTwo.Enabled = true
-	bot.ruleTwo.Interval = 7
+	bot.ruleTwo.Interval = time.Duration(7 * time.Second)
 	bot.ruleTwo.MaximumVolume = 50000.0
 	bot.ruleTwo.TransactionVolume = 3000.0
 	bot.ruleTwo.VarianceOfTransaction = 10.0
