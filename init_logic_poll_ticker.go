@@ -305,6 +305,35 @@ func insertTickerUpdate(p *Period) echo.Map {
 	return fields
 }
 
+func insertBotStatus(status string) echo.Map {
+	bp, err := influx.NewBatchPoints(influx.BatchPointsConfig{
+		Database:  "trader",
+		Precision: "s",
+	})
+	if err != nil {
+		log.Println(err)
+	}
+
+	log.Printf("-- Bot power %s", status)
+
+	tags := map[string]string{
+		"set":  "bot",
+		"type": "power",
+	}
+	fields := echo.Map{
+		"Status": status,
+	}
+
+	pt, err := influx.NewPoint("bot", tags, fields, time.Now())
+	bp.AddPoint(pt)
+	err = bot.store.Write(bp)
+	if err != nil {
+		log.Println(err)
+	}
+
+	return fields
+}
+
 func createSignature(message string, secret string) string {
 	key := []byte(secret)
 	h := hmac.New(sha256.New, key)

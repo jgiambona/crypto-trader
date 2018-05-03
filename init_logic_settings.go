@@ -33,8 +33,10 @@ func botControls(c echo.Context) error {
 
 	if power == 1 {
 		bot.running = true
+		insertBotStatus("ON")
 	} else {
 		bot.running = false
+		insertBotStatus("OFF")
 	}
 	return jsonSuccess(c, echo.Map{})
 }
