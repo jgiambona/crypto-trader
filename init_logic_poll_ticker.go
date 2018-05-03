@@ -137,7 +137,7 @@ func pollTicker() {
 
 		waitExchanges.Wait()
 		interval := time.Duration(bot.ruleOne.Interval)
-		time.Sleep(bot.ruleOne.Interval)
+		time.Sleep(interval)
 	}
 }
 
