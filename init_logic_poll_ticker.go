@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"strings"
 	"sync"
@@ -34,7 +35,6 @@ func pollTicker() {
 	var waitExchanges sync.WaitGroup
 
 	currencyPair := "NOX/ETH"
-	quantity := 0.001
 
 	simulate := true
 
@@ -59,6 +59,8 @@ func pollTicker() {
 					log.Printf("--- %.8f %0.8f", lowest, volume)
 
 					if bot.ruleOne.Enabled {
+						v := bot.ruleOne.TransactionVolume * 0.10
+						quantity := bot.ruleOne.TransactionVolume + getRandom(v)
 						targetPrice := lowest - bot.ruleOne.BidPriceStepDown
 						if volume < bot.ruleOne.MaximumVolume {
 							insertTransaction("SELL", "nox_eth", targetPrice, quantity)
@@ -84,6 +86,8 @@ func pollTicker() {
 					}
 
 					if bot.ruleTwo.Enabled && !tradePlace {
+						v := bot.ruleOne.TransactionVolume * 0.10
+						quantity := bot.ruleOne.TransactionVolume + getRandom(v)
 						targetPrice := lowest - bot.ruleTwo.BidPriceStepDown
 						if volume < bot.ruleTwo.MaximumVolume {
 							insertTransaction("SELL", "nox_eth", targetPrice, quantity)
@@ -342,4 +346,19 @@ func createSignature(message string, secret string) string {
 	h.Write([]byte(message))
 	d := hex.EncodeToString(h.Sum(nil))
 	return strings.ToUpper(d)
+}
+
+type IntRange struct {
+	min, max int64
+}
+
+func (ir *IntRange) NextRandom(r *rand.Rand) int64 {
+	return r.Int63n(ir.max-ir.min) + ir.min
+}
+
+func getRandom(v float64) float64 {
+	value := int64(v)
+	r := rand.New(rand.NewSource(20))
+	ir := IntRange{-value, value}
+	return float64(ir.NextRandom(r))
 }
