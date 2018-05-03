@@ -53,17 +53,17 @@ func main() {
 	bot.ruleOne.Interval = 7
 	bot.ruleOne.MaximumVolume = 50000.0
 	bot.ruleOne.TransactionVolume = 3000.0
-	bot.ruleOne.VarianceOfTransaction = 10
+	bot.ruleOne.VarianceOfTransaction = 10.0
 	bot.ruleOne.BidPriceStepDown = 0.0001
-	bot.ruleOne.MinimumBid = 6000.0
+	bot.ruleOne.MinimumBid = 0.00001
 
 	bot.ruleTwo.Enabled = true
 	bot.ruleTwo.Interval = 7
 	bot.ruleTwo.MaximumVolume = 50000.0
 	bot.ruleTwo.TransactionVolume = 3000.0
-	bot.ruleTwo.VarianceOfTransaction = 10
+	bot.ruleTwo.VarianceOfTransaction = 10.0
 	bot.ruleTwo.BidPriceStepDown = 0.0001
-	bot.ruleTwo.MinimumBid = 6000.0
+	bot.ruleTwo.MinimumBid = 0.00001
 
 	loadRoutes(e)
 

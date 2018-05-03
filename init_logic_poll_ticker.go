@@ -35,7 +35,6 @@ func pollTicker() {
 	var waitExchanges sync.WaitGroup
 
 	currencyPair := "NOX/ETH"
-
 	simulate := true
 
 	var placedOrder int64
