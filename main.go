@@ -54,7 +54,11 @@ func main() {
 	if port, ok := os.LookupEnv("PORT"); ok {
 		e.Logger.Fatal(e.Start(":" + port))
 	} else {
-		e.Logger.Fatal(e.Start("localhost:8000"))
+		if len(os.Getenv("T_PROD")) > 0 {
+			e.Logger.Fatal(e.Start("0.0.0.0:8000"))
+		} else {
+			e.Logger.Fatal(e.Start("localhost:8000"))
+		}
 	}
 }
 
