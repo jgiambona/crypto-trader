@@ -38,7 +38,6 @@ func pollTicker() {
 	simulate := true
 
 	var placedOrder int64
-	var fromAccountOne float64
 
 	for {
 		waitExchanges.Add(1)
@@ -50,6 +49,7 @@ func pollTicker() {
 				if len(bot.accountOne.APIKey) > 0 && len(bot.accountTwo.APIKey) > 0 {
 					switchAccountRoles()
 					tradePlace := false
+					fromAccountOne := -1.0
 
 					p := updateTicker(currencyPair)
 					lowest := p["ask"].(float64)
@@ -75,7 +75,7 @@ func pollTicker() {
 								fromAccountOne = targetPrice
 							}
 
-							if lowest >= fromAccountOne {
+							if lowest >= fromAccountOne && fromAccountOne > -1 {
 								go insertTransaction("BUY", "nox_eth", targetPrice, quantity)
 								if !simulate {
 									buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
@@ -105,7 +105,7 @@ func pollTicker() {
 								tradePlace = true
 							}
 
-							if lowest != fromAccountOne {
+							if lowest != fromAccountOne && fromAccountOne > -1 {
 								go insertTransaction("CANCEL", "nox_eth", targetPrice, quantity)
 								if simulate {
 									c, err := cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
@@ -122,7 +122,7 @@ func pollTicker() {
 								goto repeatCheckLowestBid
 							}
 
-							if lowest >= fromAccountOne {
+							if lowest >= fromAccountOne && fromAccountOne > -1 {
 								go insertTransaction("BUY", "nox_eth", targetPrice, quantity)
 								if simulate {
 									buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
