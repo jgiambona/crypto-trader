@@ -358,7 +358,7 @@ func (ir *IntRange) NextRandom(r *rand.Rand) int64 {
 
 func getRandom(v float64) float64 {
 	value := int64(v)
-	r := rand.New(rand.NewSource(20))
+	r := rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
 	ir := IntRange{-value, value}
 	return float64(ir.NextRandom(r))
 }
