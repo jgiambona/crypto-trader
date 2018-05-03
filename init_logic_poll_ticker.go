@@ -53,8 +53,10 @@ func pollTicker() {
 					tradePlace := false
 
 					p := updateTicker(currencyPair)
-					lowest := p["bid"].(float64)
+					lowest := p["ask"].(float64)
 					volume := p["volume"].(float64)
+
+					log.Printf("--- %.8f %0.8f", lowest, volume)
 
 					if bot.ruleOne.Enabled {
 						targetPrice := lowest - bot.ruleOne.BidPriceStepDown
