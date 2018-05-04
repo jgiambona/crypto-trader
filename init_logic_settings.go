@@ -93,6 +93,7 @@ func updateSettings(c echo.Context) error {
 	case 'm':
 		interval *= time.Minute
 	case 's':
+		interval *= time.Second
 	default:
 		interval *= time.Second
 	}
