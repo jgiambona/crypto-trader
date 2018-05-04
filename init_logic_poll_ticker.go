@@ -61,8 +61,8 @@ func pollTicker() {
 						v := bot.ruleOne.TransactionVolume * 0.10
 						quantity := bot.ruleOne.TransactionVolume + getRandom(v)
 						targetPrice := lowest - bot.ruleOne.BidPriceStepDown
-						if lowest >= bot.ruleOne.MinimumBid {
-							if volume < bot.ruleOne.MaximumVolume {
+						if targetPrice >= bot.ruleOne.MinimumBid {
+							if targetPrice < bot.ruleOne.MaximumVolume {
 								go insertTransaction("SELL", "nox_eth", targetPrice, quantity)
 								if !simulate {
 									o, err := sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
@@ -90,7 +90,7 @@ func pollTicker() {
 						v := bot.ruleOne.TransactionVolume * 0.10
 						quantity := bot.ruleOne.TransactionVolume + getRandom(v)
 						targetPrice := lowest - bot.ruleTwo.BidPriceStepDown
-						if lowest >= bot.ruleTwo.MinimumBid {
+						if targetPrice >= bot.ruleTwo.MinimumBid {
 							if volume < bot.ruleTwo.MaximumVolume {
 								go insertTransaction("SELL", "nox_eth", targetPrice, quantity)
 								if simulate {
