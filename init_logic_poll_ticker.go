@@ -62,7 +62,7 @@ func pollTicker() {
 						targetPrice := lowest - bot.ruleOne.BidPriceStepDown
 						if targetPrice >= bot.ruleOne.MinimumBid {
 							if volume < bot.ruleOne.MaximumVolume {
-								go insertTransaction("SELL", "nox_eth", targetPrice, quantity)
+								insertTransaction("SELL", "nox_eth", targetPrice, quantity)
 								if !bot.simulate {
 									o, err := sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
 										currencyPair, targetPrice, quantity)
@@ -75,7 +75,7 @@ func pollTicker() {
 							}
 
 							if lowest >= fromAccountOne && fromAccountOne > -1 {
-								go insertTransaction("BUY", "nox_eth", targetPrice, quantity)
+								insertTransaction("BUY", "nox_eth", targetPrice, quantity)
 								if !bot.simulate {
 									buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
 										currencyPair, targetPrice, quantity)
@@ -91,7 +91,7 @@ func pollTicker() {
 						targetPrice := lowest - bot.ruleTwo.BidPriceStepDown
 						if targetPrice >= bot.ruleTwo.MinimumBid {
 							if volume < bot.ruleTwo.MaximumVolume {
-								go insertTransaction("SELL", "nox_eth", targetPrice, quantity)
+								insertTransaction("SELL", "nox_eth", targetPrice, quantity)
 								if bot.simulate {
 									o, err := sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
 										currencyPair, targetPrice, quantity)
@@ -105,7 +105,7 @@ func pollTicker() {
 							}
 
 							if lowest != fromAccountOne && fromAccountOne > -1 {
-								go insertTransaction("CANCEL", "nox_eth", targetPrice, quantity)
+								insertTransaction("CANCEL", "nox_eth", targetPrice, quantity)
 								if bot.simulate {
 									c, err := cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
 										currencyPair, placedOrder)
@@ -122,7 +122,7 @@ func pollTicker() {
 							}
 
 							if lowest >= fromAccountOne && fromAccountOne > -1 {
-								go insertTransaction("BUY", "nox_eth", targetPrice, quantity)
+								insertTransaction("BUY", "nox_eth", targetPrice, quantity)
 								if bot.simulate {
 									buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
 										currencyPair, targetPrice, quantity)
@@ -218,6 +218,8 @@ func insertTransaction(t, pair string, price, quantity float64) {
 	if err != nil {
 		log.Println(err)
 	}
+
+	time.Sleep(1 * time.Second)
 }
 
 func updateTicker(pair string) echo.Map {

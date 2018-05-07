@@ -76,7 +76,7 @@ func main() {
 		e.Logger.Fatal(e.Start(":" + port))
 	} else {
 		if len(os.Getenv("T_PROD")) > 0 {
-			e.Logger.Fatal(e.Start("0.0.0.0:8000"))
+			e.Logger.Fatal(e.StartTLS("0.0.0.0:8000", "ssl/fullchain.pem", "ssl/privkey.pem"))
 		} else {
 			e.Logger.Fatal(e.Start("localhost:8000"))
 		}
