@@ -150,7 +150,7 @@ func buyLimit(apiKey, apiSecret, currencyPair string, price, quantity float64) (
 	}
 
 	data := OrderResponse{}
-	return data, sendPayload("GET", path, headers, strings.NewReader(message), &data)
+	return data, sendPayload("POST", path, headers, strings.NewReader(message), &data)
 }
 
 // Open a sell order (limit) for a specified currency pair.
@@ -173,7 +173,7 @@ func sellLimit(apiKey, apiSecret, currencyPair string, price, quantity float64) 
 	}
 
 	data := OrderResponse{}
-	return data, sendPayload("GET", path, headers, strings.NewReader(message), &data)
+	return data, sendPayload("POST", path, headers, strings.NewReader(message), &data)
 }
 
 // Open a buy order (market) of specified amount for
@@ -195,7 +195,7 @@ func buyMarket(apiKey, apiSecret, currencyPair string, quantity float64) (OrderR
 	}
 
 	data := OrderResponse{}
-	return data, sendPayload("GET", path, headers, strings.NewReader(message), &data)
+	return data, sendPayload("POST", path, headers, strings.NewReader(message), &data)
 }
 
 // Open a sell order (market) for specified amount of
@@ -217,7 +217,7 @@ func sellMarket(apiKey, apiSecret, currencyPair string, quantity float64) (Order
 	}
 
 	data := OrderResponse{}
-	return data, sendPayload("GET", path, headers, strings.NewReader(message), &data)
+	return data, sendPayload("POST", path, headers, strings.NewReader(message), &data)
 }
 
 // Cancel order.
@@ -238,5 +238,5 @@ func cancelLimit(apiKey, apiSecret, currencyPair string, orderID int64) (CancelO
 	}
 
 	data := CancelOrderResponse{}
-	return data, sendPayload("GET", path, headers, strings.NewReader(message), &data)
+	return data, sendPayload("POST", path, headers, strings.NewReader(message), &data)
 }

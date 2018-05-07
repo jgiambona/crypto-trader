@@ -16,7 +16,7 @@ func TestPollTicker(t *testing.T) {
 }
 
 func TestBuy(t *testing.T) {
-	path := fmt.Sprintf("%s%s", "https://api.livecoin.com/", "/exchange/buylimit")
+	path := fmt.Sprintf("%s%s", "https://api.livecoin.net", "/exchange/buylimit")
 
 	construct := url.Values{}
 	construct.Add("currencyPair", "BTC/USD")
