@@ -185,6 +185,9 @@ func sendPayload(method, path string, headers map[string]string, body io.Reader,
 		return err
 	}
 
+	log.Printf("%s %d", res.Status, res.StatusCode)
+	log.Printf("%+v", contents)
+
 	err = json.Unmarshal(contents, &result)
 	return err
 }
