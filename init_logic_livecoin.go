@@ -26,6 +26,13 @@ type (
 		TradeQuantity float64 `json:"tradeQuantity"`
 	}
 
+	// BalanceResponse stores available balance status.
+	BalanceResponse struct {
+		Type     string  `json:"type"`
+		Currency string  `json:"currency"`
+		Value    float64 `json:"value"`
+	}
+
 	// TickerResponse stores the pricing information.
 	TickerResponse struct {
 		Currency     string  `json:"cur"`
@@ -240,3 +247,23 @@ func cancelLimit(apiKey, apiSecret, currencyPair string, orderID int64) (CancelO
 	data := CancelOrderResponse{}
 	return data, sendPayload("POST", path, headers, strings.NewReader(message), &data)
 }
+
+// Returns available balance for selected currency
+func getBalance(apiKey, apiSecret, currencyPair string) (BalanceResponse, error) {
+	path := fmt.Sprintf("%s/payment/balance", LiveCoinAPIURL)
+
+	construct := url.Values{}
+	construct.Add("currencyPair", currencyPair)
+	message := construct.Encode()
+
+	headers := map[string]string{
+		"API-Key":        apiKey,
+		"Sign":           createSignature(message, apiSecret),
+		"Content-Type":   "application/x-www-form-urlencoded",
+		"Content-Length": strconv.Itoa(len(message)),
+	}
+
+	data := BalanceResponse{}
+	return data, sendPayload("POST", path, headers, strings.NewReader(message), &data)
+}
+

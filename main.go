@@ -45,8 +45,6 @@ func main() {
 		})
 	}
 
-	bot.running = false
-	bot.simulate = true
 	bot.availableCurrencyPairs = strings.Fields(CurrencyPairAllowed)
 	bot.baseCurrencies = strings.Fields(CurrencyAllowed)
 

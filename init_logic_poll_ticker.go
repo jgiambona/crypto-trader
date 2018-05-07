@@ -34,6 +34,12 @@ type (
 func pollTicker() {
 	var waitExchanges sync.WaitGroup
 
+	bot.running = false
+	insertBotStatus("OFF")
+
+	bot.simulate = true
+	insertBotSimulateStatus("ON")
+
 	currencyPair := "NOX/ETH"
 
 	var placedOrder int64
@@ -41,13 +47,21 @@ func pollTicker() {
 
 	for {
 		waitExchanges.Add(1)
+
+		if !bot.running {
+			botVolume = 0
+		}
+
 		go func() {
 			defer waitExchanges.Done()
 
 		repeatCheckLowestBid:
 			if bot.running {
 				if len(bot.accountOne.APIKey) > 0 && len(bot.accountTwo.APIKey) > 0 {
-					switchAccountRoles()
+
+					switchAccountRolesSeller()
+					switchAccountRolesBuyer()
+
 					tradePlace := false
 					fromAccountOne := -1.0
 
@@ -143,12 +157,48 @@ func pollTicker() {
 	}
 }
 
-func switchAccountRoles() (err error) {
+func switchAccountRolesSeller() (err error) {
 	swap := false
+
+	b, err := getBalance(bot.accountOne.APIKey, bot.accountOne.APISecret, "NOX")
+	if err != nil {
+		log.Print("unable to get balance", err)
+	}
+
+	t1 := bot.ruleOne.TransactionVolume + (bot.ruleOne.TransactionVolume * bot.ruleOne.VarianceOfTransaction)
+	t2 := bot.ruleTwo.TransactionVolume + (bot.ruleTwo.TransactionVolume * bot.ruleTwo.VarianceOfTransaction)
+	if b.Value < t1 || b.Value < t2 {
+		swap = true
+	}
+
 	if swap {
 		tmp := bot.accountOne
 		bot.accountOne = bot.accountTwo
 		bot.accountTwo = tmp
+	}
+
+	time.Sleep(1 * time.Second)
+	return nil
+}
+
+func switchAccountRolesBuyer() (err error) {
+	swap := false
+
+	b, err := getBalance(bot.accountTwo.APIKey, bot.accountTwo.APISecret, "ETH")
+	if err != nil {
+		log.Print("unable to get balance", err)
+	}
+
+	t1 := bot.ruleOne.TransactionVolume + (bot.ruleOne.TransactionVolume * bot.ruleOne.VarianceOfTransaction)
+	t2 := bot.ruleTwo.TransactionVolume + (bot.ruleTwo.TransactionVolume * bot.ruleTwo.VarianceOfTransaction)
+	if b.Value < t1 || b.Value < t2 {
+		swap = true
+	}
+
+	if swap {
+		tmp := bot.accountTwo
+		bot.accountTwo = bot.accountOne
+		bot.accountOne = tmp
 	}
 	return nil
 }
@@ -348,6 +398,7 @@ func insertBotStatus(status string) echo.Map {
 		log.Println(err)
 	}
 
+	time.Sleep(1 * time.Second)
 	return fields
 }
 
@@ -377,6 +428,7 @@ func insertBotSimulateStatus(status string) echo.Map {
 		log.Println(err)
 	}
 
+	time.Sleep(1 * time.Second)
 	return fields
 }
 
