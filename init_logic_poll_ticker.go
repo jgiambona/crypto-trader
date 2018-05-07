@@ -35,7 +35,6 @@ func pollTicker() {
 	var waitExchanges sync.WaitGroup
 
 	currencyPair := "NOX/ETH"
-	simulate := true
 
 	var placedOrder int64
 
@@ -62,9 +61,9 @@ func pollTicker() {
 						quantity := bot.ruleOne.TransactionVolume + getRandom(v)
 						targetPrice := lowest - bot.ruleOne.BidPriceStepDown
 						if targetPrice >= bot.ruleOne.MinimumBid {
-							if targetPrice < bot.ruleOne.MaximumVolume {
+							if volume < bot.ruleOne.MaximumVolume {
 								go insertTransaction("SELL", "nox_eth", targetPrice, quantity)
-								if !simulate {
+								if !bot.simulate {
 									o, err := sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
 										currencyPair, targetPrice, quantity)
 									if err != nil {
@@ -77,7 +76,7 @@ func pollTicker() {
 
 							if lowest >= fromAccountOne && fromAccountOne > -1 {
 								go insertTransaction("BUY", "nox_eth", targetPrice, quantity)
-								if !simulate {
+								if !bot.simulate {
 									buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
 										currencyPair, targetPrice, quantity)
 								}
@@ -93,7 +92,7 @@ func pollTicker() {
 						if targetPrice >= bot.ruleTwo.MinimumBid {
 							if volume < bot.ruleTwo.MaximumVolume {
 								go insertTransaction("SELL", "nox_eth", targetPrice, quantity)
-								if simulate {
+								if bot.simulate {
 									o, err := sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
 										currencyPair, targetPrice, quantity)
 									if err != nil {
@@ -107,7 +106,7 @@ func pollTicker() {
 
 							if lowest != fromAccountOne && fromAccountOne > -1 {
 								go insertTransaction("CANCEL", "nox_eth", targetPrice, quantity)
-								if simulate {
+								if bot.simulate {
 									c, err := cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
 										currencyPair, placedOrder)
 
@@ -124,7 +123,7 @@ func pollTicker() {
 
 							if lowest >= fromAccountOne && fromAccountOne > -1 {
 								go insertTransaction("BUY", "nox_eth", targetPrice, quantity)
-								if simulate {
+								if bot.simulate {
 									buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
 										currencyPair, targetPrice, quantity)
 								}
@@ -329,6 +328,35 @@ func insertBotStatus(status string) echo.Map {
 	tags := map[string]string{
 		"set":  "bot",
 		"type": "power",
+	}
+	fields := echo.Map{
+		"Status": status,
+	}
+
+	pt, err := influx.NewPoint("bot", tags, fields, time.Now())
+	bp.AddPoint(pt)
+	err = bot.store.Write(bp)
+	if err != nil {
+		log.Println(err)
+	}
+
+	return fields
+}
+
+func insertBotSimulateStatus(status string) echo.Map {
+	bp, err := influx.NewBatchPoints(influx.BatchPointsConfig{
+		Database:  "trader",
+		Precision: "s",
+	})
+	if err != nil {
+		log.Println(err)
+	}
+
+	log.Printf("-- Bot simulate %s", status)
+
+	tags := map[string]string{
+		"set":  "bot",
+		"type": "simulate",
 	}
 	fields := echo.Map{
 		"Status": status,

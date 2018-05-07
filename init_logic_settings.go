@@ -1,11 +1,15 @@
 package main
 
 import (
+	"bytes"
+	"encoding/csv"
+	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
 
+	influx "github.com/influxdata/influxdb/client/v2"
 	"github.com/labstack/echo"
 )
 
@@ -147,21 +151,51 @@ func updateSettings(c echo.Context) error {
 	})
 }
 
-func jsonSuccess(c echo.Context, o echo.Map) error {
-	o["success"] = true
-	return c.JSON(http.StatusOK, o)
+func botExported(c echo.Context) error {
+	q := influx.Query{
+		Command:  "select * from transactions",
+		Database: "trader",
+	}
+
+	resp, err := bot.store.Query(q)
+	if err != nil {
+		log.Print("error ", err)
+	}
+
+	var b bytes.Buffer
+
+	writer := csv.NewWriter(&b)
+
+	for i := 0; i < len(resp.Results[0].Series[0].Values); i++ {
+		err = writer.Write([]string{
+			resp.Results[0].Series[0].Values[i][0].(string),
+			resp.Results[0].Series[0].Values[i][1].(string),
+			string(resp.Results[0].Series[0].Values[i][2].(string)),
+			string(resp.Results[0].Series[0].Values[i][3].(json.Number)),
+			string(resp.Results[0].Series[0].Values[i][4].(json.Number)),
+		})
+		if err != nil {
+			log.Print("error ", err)
+		}
+	}
+	writer.Flush()
+
+	return c.Blob(http.StatusOK, "text/csv", b.Bytes())
 }
 
-func jsonBadRequest(c echo.Context, i interface{}) error {
-	return c.JSON(http.StatusBadRequest, echo.Map{
-		"success": false,
-		"message": i,
-	})
-}
+func updateSimulate(c echo.Context) error {
+	power, err := strconv.ParseInt(c.FormValue("power"), 10, 64)
+	if err != nil {
+		jsonBadRequest(c, err)
+	}
 
-func jsonServerError(c echo.Context, i interface{}) error {
-	return c.JSON(http.StatusInternalServerError, echo.Map{
-		"success": false,
-		"message": i,
-	})
+	if power == 1 {
+		bot.simulate = true
+		insertBotSimulateStatus("ON")
+	} else {
+		bot.simulate = false
+		insertBotSimulateStatus("OFF")
+	}
+
+	return jsonSuccess(c, echo.Map{})
 }
