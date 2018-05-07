@@ -37,6 +37,7 @@ func pollTicker() {
 	currencyPair := "NOX/ETH"
 
 	var placedOrder int64
+	var botVolume float64 = 0
 
 	for {
 		waitExchanges.Add(1)
@@ -61,7 +62,8 @@ func pollTicker() {
 						quantity := bot.ruleOne.TransactionVolume + getRandom(v)
 						targetPrice := lowest - bot.ruleOne.BidPriceStepDown
 						if targetPrice >= bot.ruleOne.MinimumBid {
-							if volume < bot.ruleOne.MaximumVolume {
+							if botVolume < bot.ruleOne.MaximumVolume {
+								botVolume += quantity
 								insertTransaction("SELL", "nox_eth", targetPrice, quantity)
 								if !bot.simulate {
 									o, err := sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
@@ -91,6 +93,7 @@ func pollTicker() {
 						targetPrice := lowest - bot.ruleTwo.BidPriceStepDown
 						if targetPrice >= bot.ruleTwo.MinimumBid {
 							if volume < bot.ruleTwo.MaximumVolume {
+								botVolume += quantity
 								insertTransaction("SELL", "nox_eth", targetPrice, quantity)
 								if bot.simulate {
 									o, err := sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
