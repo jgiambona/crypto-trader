@@ -69,7 +69,7 @@ func pollTicker() {
 									o, err := sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
 										currencyPair, targetPrice, quantity)
 									if err != nil {
-										log.Print("error occurred in creating sell order")
+										log.Print("error occurred in creating sell order ", err)
 									}
 									placedOrder = o.OrderID
 								}
