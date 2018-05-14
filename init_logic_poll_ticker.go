@@ -90,7 +90,8 @@ func pollTicker() {
 								fromAccountOne = targetPrice
 							}
 
-							if lowest >= fromAccountOne && fromAccountOne > -1 && placedOrder > 0 {
+							if lowest >= fromAccountOne && fromAccountOne > -1 &&
+								placedOrder > 0 {
 								insertTransaction("BUY", "nox_eth", targetPrice, quantity)
 								if !bot.simulate {
 									buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
@@ -121,7 +122,8 @@ func pollTicker() {
 								tradePlace = true
 							}
 
-							if lowest != fromAccountOne && fromAccountOne > -1 && placedOrder > 0 {
+							if lowest != fromAccountOne && fromAccountOne > -1 &&
+								placedOrder > 0 {
 								insertTransaction("CANCEL", "nox_eth", targetPrice, quantity)
 								if bot.simulate {
 									c, err := cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
@@ -138,7 +140,8 @@ func pollTicker() {
 								goto repeatCheckLowestBid
 							}
 
-							if lowest >= fromAccountOne && fromAccountOne > -1 && placedOrder > 0 {
+							if lowest >= fromAccountOne && fromAccountOne > -1 &&
+								placedOrder > 0 {
 								insertTransaction("BUY", "nox_eth", targetPrice, quantity)
 								if bot.simulate {
 									buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
