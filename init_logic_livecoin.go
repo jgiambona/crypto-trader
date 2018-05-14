@@ -253,7 +253,7 @@ func getBalance(apiKey, apiSecret, currency string) (BalanceResponse, error) {
 	path := fmt.Sprintf("%s/payment/balance", LiveCoinAPIURL)
 
 	construct := url.Values{}
-	construct.Add("currency", currencyPair)
+	construct.Add("currency", currency)
 	message := construct.Encode()
 
 	headers := map[string]string{
