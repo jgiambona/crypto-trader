@@ -249,11 +249,11 @@ func cancelLimit(apiKey, apiSecret, currencyPair string, orderID int64) (CancelO
 }
 
 // Returns available balance for selected currency
-func getBalance(apiKey, apiSecret, currencyPair string) (BalanceResponse, error) {
+func getBalance(apiKey, apiSecret, currency string) (BalanceResponse, error) {
 	path := fmt.Sprintf("%s/payment/balance", LiveCoinAPIURL)
 
 	construct := url.Values{}
-	construct.Add("currencyPair", currencyPair)
+	construct.Add("currency", currencyPair)
 	message := construct.Encode()
 
 	headers := map[string]string{

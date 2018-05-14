@@ -31,7 +31,6 @@ var bot Bot
 func main() {
 	e := echo.New()
 	e.HideBanner = true
-
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
 
