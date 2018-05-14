@@ -48,21 +48,23 @@ func main() {
 	bot.baseCurrencies = strings.Fields(CurrencyAllowed)
 
 	bot.accountOne.APIKey = "bot"
+
 	bot.accountTwo.APIKey = "bot"
+
 	bot.ruleOne.Enabled = true
 	bot.ruleOne.Interval = time.Duration(7 * time.Second)
 	bot.ruleOne.MaximumVolume = 50000.0
-	bot.ruleOne.TransactionVolume = 3000.0
+	bot.ruleOne.TransactionVolume = 300.0
 	bot.ruleOne.VarianceOfTransaction = 10.0
-	bot.ruleOne.BidPriceStepDown = 0.0001
+	bot.ruleOne.BidPriceStepDown = 0.00000001
 	bot.ruleOne.MinimumBid = 0.00001
 
 	bot.ruleTwo.Enabled = true
 	bot.ruleTwo.Interval = time.Duration(7 * time.Second)
 	bot.ruleTwo.MaximumVolume = 50000.0
-	bot.ruleTwo.TransactionVolume = 3000.0
+	bot.ruleTwo.TransactionVolume = 300.0
 	bot.ruleTwo.VarianceOfTransaction = 10.0
-	bot.ruleTwo.BidPriceStepDown = 0.0001
+	bot.ruleTwo.BidPriceStepDown = 0.00000001
 	bot.ruleTwo.MinimumBid = 0.00001
 
 	loadRoutes(e)

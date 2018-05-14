@@ -239,7 +239,7 @@ func sendPayload(method, path string, headers map[string]string, body io.Reader,
 	}
 
 	log.Printf("%s %d", res.Status, res.StatusCode)
-	log.Printf("%+v", contents)
+	log.Printf("%s", string(contents))
 
 	err = json.Unmarshal(contents, &result)
 	return err

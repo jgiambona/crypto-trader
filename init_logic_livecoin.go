@@ -250,8 +250,6 @@ func cancelLimit(apiKey, apiSecret, currencyPair string, orderID int64) (CancelO
 
 // Returns available balance for selected currency
 func getBalance(apiKey, apiSecret, currency string) (BalanceResponse, error) {
-	path := fmt.Sprintf("%s/payment/balance", LiveCoinAPIURL)
-
 	construct := url.Values{}
 	construct.Add("currency", currency)
 	message := construct.Encode()
@@ -259,11 +257,16 @@ func getBalance(apiKey, apiSecret, currency string) (BalanceResponse, error) {
 	headers := map[string]string{
 		"API-Key":        apiKey,
 		"Sign":           createSignature(message, apiSecret),
-		"Content-Type":   "application/x-www-form-urlencoded",
-		"Content-Length": strconv.Itoa(len(message)),
 	}
 
+	path := fmt.Sprintf("%s/payment/balance?%s", LiveCoinAPIURL, message)
+	log.Print("-- ", apiKey)
+	log.Print("-- ", apiSecret)
+	log.Print("-- ", createSignature)
+	log.Print("-- ", headers)
+	log.Print("-- ", path)
+
 	data := BalanceResponse{}
-	return data, sendPayload("POST", path, headers, strings.NewReader(message), &data)
+	return data, sendPayload("GET", path, headers, nil, &data)
 }
 
