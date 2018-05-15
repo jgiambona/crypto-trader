@@ -66,21 +66,16 @@ func pollTicker() {
 						return
 					}
 
-					// if err := switchAccountRolesBuyer(); err != nil {
-					// 	log.Print(err)
-					// 	return
-					// }
-
 					tradePlace := false
 					fromAccountOne := -1.0
 
-					p := updateTicker(currencyPair)
-					lowest := p["ask"].(float64)
-					volume := p["volume"].(float64)
-
-					log.Printf("--- %.8f %0.8f", lowest, volume)
-
 					if bot.ruleOne.Enabled {
+						p := updateTicker(currencyPair)
+						lowest := p["ask"].(float64)
+						volume := p["volume"].(float64)
+
+						log.Printf("--- %.8f %0.8f", lowest, volume)
+
 						v := bot.ruleOne.TransactionVolume * 0.10
 						quantity := bot.ruleOne.TransactionVolume + getRandom(v)
 						targetPrice := lowest - bot.ruleOne.BidPriceStepDown
@@ -117,6 +112,12 @@ func pollTicker() {
 					}
 
 					if bot.ruleTwo.Enabled && !tradePlace {
+						p := updateTicker(currencyPair)
+						lowest := p["ask"].(float64)
+						volume := p["volume"].(float64)
+
+						log.Printf("--- %.8f %0.8f", lowest, volume)
+
 						v := bot.ruleOne.TransactionVolume * 0.10
 						quantity := bot.ruleOne.TransactionVolume + getRandom(v)
 						targetPrice := lowest - bot.ruleTwo.BidPriceStepDown
