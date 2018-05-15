@@ -61,16 +61,6 @@ func pollTicker() {
 			if bot.running {
 				if len(bot.accountOne.APIKey) > 0 && len(bot.accountTwo.APIKey) > 0 {
 
-					if err := switchAccountRolesSeller(); err != nil {
-						log.Print(err)
-						return
-					}
-
-					if err := switchAccountRolesBuyer(); err != nil {
-						log.Print(err)
-						return
-					}
-
 					tradePlace := false
 					fromAccountOne := -1.0
 
@@ -84,6 +74,17 @@ func pollTicker() {
 						v := bot.ruleOne.TransactionVolume * 0.10
 						quantity := bot.ruleOne.TransactionVolume + getRandom(v)
 						targetPrice := lowest - bot.ruleOne.BidPriceStepDown
+
+						if err := switchAccountRolesSeller(quantity); err != nil {
+							log.Print(err)
+							return
+						}
+
+						if err := switchAccountRolesBuyer(targetPrice); err != nil {
+							log.Print(err)
+							return
+						}
+
 						if targetPrice >= bot.ruleOne.MinimumBid {
 							if botVolume < bot.ruleOne.MaximumVolume {
 								botVolume += quantity
@@ -126,6 +127,16 @@ func pollTicker() {
 						v := bot.ruleOne.TransactionVolume * 0.10
 						quantity := bot.ruleOne.TransactionVolume + getRandom(v)
 						targetPrice := lowest - bot.ruleTwo.BidPriceStepDown
+
+						if err := switchAccountRolesSeller(quantity); err != nil {
+							log.Print(err)
+							return
+						}
+
+						if err := switchAccountRolesBuyer(targetPrice); err != nil {
+							log.Print(err)
+							return
+						}
 
 						if targetPrice >= bot.ruleTwo.MinimumBid && placedOrder < 0 {
 							if volume < bot.ruleTwo.MaximumVolume {
@@ -188,7 +199,7 @@ func pollTicker() {
 	}
 }
 
-func switchAccountRolesSeller() (err error) {
+func switchAccountRolesSeller(quantity float64) (err error) {
 	count := 0
 
 switchAccount:
@@ -209,9 +220,8 @@ switchAccount:
 		return errors.New("-- error unable to get balance seller")
 	}
 
-	t1 := bot.ruleOne.TransactionVolume + (bot.ruleOne.TransactionVolume * (bot.ruleOne.VarianceOfTransaction / 100.0))
-	t2 := bot.ruleTwo.TransactionVolume + (bot.ruleTwo.TransactionVolume * (bot.ruleTwo.VarianceOfTransaction / 100.0))
-	if b.Value < t1 || b.Value < t2 {
+	t1 := quantity
+	if b.Value < t1 {
 		log.Print("-- commence switch roles seller")
 		swap = true
 
@@ -241,7 +251,7 @@ switchAccount:
 	return nil
 }
 
-func switchAccountRolesBuyer() (err error) {
+func switchAccountRolesBuyer(price float64) (err error) {
 	count := 0
 
 switchAccount:
@@ -262,9 +272,8 @@ switchAccount:
 		return errors.New("-- error unable to get balance buyer")
 	}
 
-	t1 := bot.ruleOne.TransactionVolume + (bot.ruleOne.TransactionVolume * (bot.ruleOne.VarianceOfTransaction / 100.0))
-	t2 := bot.ruleTwo.TransactionVolume + (bot.ruleTwo.TransactionVolume * (bot.ruleTwo.VarianceOfTransaction / 100.0))
-	if b.Value < t1 || b.Value < t2 {
+	t1 := price
+	if b.Value < t1 {
 		log.Print("-- commence switch roles buyer")
 		swap = true
 
