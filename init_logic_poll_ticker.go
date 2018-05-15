@@ -75,6 +75,8 @@ func pollTicker() {
 						quantity := bot.ruleOne.TransactionVolume + getRandom(v)
 						targetPrice := lowest - bot.ruleOne.BidPriceStepDown
 
+						log.Printf("--- %.8f %0.8f", targetPrice, quantity)
+
 						if err := switchAccountRolesSeller(quantity); err != nil {
 							log.Print(err)
 							return
@@ -127,6 +129,8 @@ func pollTicker() {
 						v := bot.ruleOne.TransactionVolume * 0.10
 						quantity := bot.ruleOne.TransactionVolume + getRandom(v)
 						targetPrice := lowest - bot.ruleTwo.BidPriceStepDown
+
+						log.Printf("--- %.8f %0.8f", targetPrice, quantity)
 
 						if err := switchAccountRolesSeller(quantity); err != nil {
 							log.Print(err)
