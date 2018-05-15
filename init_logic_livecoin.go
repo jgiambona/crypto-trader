@@ -142,7 +142,7 @@ func getCoinInfo() {
 func buyLimit(apiKey, apiSecret, currencyPair string, price, quantity float64) (OrderResponse, error) {
 	path := fmt.Sprintf("%s/exchange/buylimit", LiveCoinAPIURL)
 
-	p := strconv.FormatFloat(price, 'f', 5, 64)
+	p := strconv.FormatFloat(price, 'f', 8, 64)
 	q := strconv.FormatFloat(quantity, 'f', 8, 64)
 	construct := url.Values{}
 	construct.Add("currencyPair", currencyPair)
