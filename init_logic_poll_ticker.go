@@ -66,6 +66,11 @@ func pollTicker() {
 						return
 					}
 
+					if err := switchAccountRolesBuyer(); err != nil {
+						log.Print(err)
+						return
+					}
+
 					tradePlace := false
 					fromAccountOne := -1.0
 
