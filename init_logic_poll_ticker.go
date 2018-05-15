@@ -5,11 +5,13 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"io"
 	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -59,8 +61,15 @@ func pollTicker() {
 			if bot.running {
 				if len(bot.accountOne.APIKey) > 0 && len(bot.accountTwo.APIKey) > 0 {
 
-					switchAccountRolesSeller()
-					switchAccountRolesBuyer()
+					if err := switchAccountRolesSeller(); err != nil {
+						log.Print(err)
+						return
+					}
+
+					// if err := switchAccountRolesBuyer(); err != nil {
+					// 	log.Print(err)
+					// 	return
+					// }
 
 					tradePlace := false
 					fromAccountOne := -1.0
@@ -78,7 +87,6 @@ func pollTicker() {
 						if targetPrice >= bot.ruleOne.MinimumBid {
 							if botVolume < bot.ruleOne.MaximumVolume {
 								botVolume += quantity
-								insertTransaction("SELL", "nox_eth", targetPrice, quantity)
 								if !bot.simulate {
 									o, err := sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
 										currencyPair, targetPrice, quantity)
@@ -86,18 +94,24 @@ func pollTicker() {
 										log.Print("error occurred in creating sell order ", err)
 									}
 									placedOrder = o.OrderID
+								} else {
+									placedOrder = 1
 								}
+								insertTransaction("SELL", "nox_eth", targetPrice, quantity,
+									strconv.FormatBool(bot.simulate), "none")
 								fromAccountOne = targetPrice
 							}
 
 							if lowest >= fromAccountOne && fromAccountOne > -1 &&
 								placedOrder > 0 {
-								insertTransaction("BUY", "nox_eth", targetPrice, quantity)
 								if !bot.simulate {
 									buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
 										currencyPair, targetPrice, quantity)
 								}
+								insertTransaction("BUY", "nox_eth", targetPrice, quantity,
+									strconv.FormatBool(bot.simulate), "none")
 								tradePlace = true
+								placedOrder = -1
 							}
 						}
 					}
@@ -106,26 +120,29 @@ func pollTicker() {
 						v := bot.ruleOne.TransactionVolume * 0.10
 						quantity := bot.ruleOne.TransactionVolume + getRandom(v)
 						targetPrice := lowest - bot.ruleTwo.BidPriceStepDown
-						if targetPrice >= bot.ruleTwo.MinimumBid {
+
+						if targetPrice >= bot.ruleTwo.MinimumBid && placedOrder < 0 {
 							if volume < bot.ruleTwo.MaximumVolume {
 								botVolume += quantity
-								insertTransaction("SELL", "nox_eth", targetPrice, quantity)
-								if bot.simulate {
+								if !bot.simulate {
 									o, err := sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
 										currencyPair, targetPrice, quantity)
 									if err != nil {
 										log.Print("error occurred in creating sell order")
 									}
 									placedOrder = o.OrderID
+								} else {
+									placedOrder = 1
 								}
+								insertTransaction("SELL", "nox_eth", targetPrice, quantity,
+									strconv.FormatBool(bot.simulate), "none")
 								fromAccountOne = targetPrice
 								tradePlace = true
 							}
 
 							if lowest != fromAccountOne && fromAccountOne > -1 &&
 								placedOrder > 0 {
-								insertTransaction("CANCEL", "nox_eth", targetPrice, quantity)
-								if bot.simulate {
+								if !bot.simulate {
 									c, err := cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
 										currencyPair, placedOrder)
 
@@ -137,16 +154,21 @@ func pollTicker() {
 										log.Print("unable to cancel order")
 									}
 								}
+								insertTransaction("CANCEL", "nox_eth", targetPrice, quantity,
+									strconv.FormatBool(bot.simulate), "none")
+								placedOrder = -1
 								goto repeatCheckLowestBid
 							}
 
 							if lowest >= fromAccountOne && fromAccountOne > -1 &&
 								placedOrder > 0 {
-								insertTransaction("BUY", "nox_eth", targetPrice, quantity)
-								if bot.simulate {
+								if !bot.simulate {
 									buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
 										currencyPair, targetPrice, quantity)
 								}
+								insertTransaction("BUY", "nox_eth", targetPrice, quantity,
+									strconv.FormatBool(bot.simulate), "none")
+								placedOrder = -1
 							}
 						}
 					}
@@ -161,6 +183,9 @@ func pollTicker() {
 }
 
 func switchAccountRolesSeller() (err error) {
+	count := 0
+
+switchAccount:
 	swap := false
 
 	b, err := getBalance(bot.accountOne.APIKey, bot.accountOne.APISecret, "NOX")
@@ -168,16 +193,42 @@ func switchAccountRolesSeller() (err error) {
 		log.Print("unable to get balance", err)
 	}
 
-	t1 := bot.ruleOne.TransactionVolume + (bot.ruleOne.TransactionVolume * bot.ruleOne.VarianceOfTransaction)
-	t2 := bot.ruleTwo.TransactionVolume + (bot.ruleTwo.TransactionVolume * bot.ruleTwo.VarianceOfTransaction)
+	if err != nil || b.Type == "" {
+		bot.running = false
+		insertBotStatus("OFF")
+
+		bot.simulate = true
+		insertBotSimulateStatus("ON")
+
+		return errors.New("-- error unable to get balance seller")
+	}
+
+	t1 := bot.ruleOne.TransactionVolume + (bot.ruleOne.TransactionVolume * (bot.ruleOne.VarianceOfTransaction / 100.0))
+	t2 := bot.ruleTwo.TransactionVolume + (bot.ruleTwo.TransactionVolume * (bot.ruleTwo.VarianceOfTransaction / 100.0))
 	if b.Value < t1 || b.Value < t2 {
+		log.Print("-- commence switch roles seller")
 		swap = true
+
+		// increment counter to check if both accounts is invalid
+		count += 1
 	}
 
 	if swap {
 		tmp := bot.accountOne
 		bot.accountOne = bot.accountTwo
 		bot.accountTwo = tmp
+
+		if count == 1 {
+			goto switchAccount
+		} else {
+			bot.running = false
+			insertBotStatus("OFF")
+
+			bot.simulate = true
+			insertBotSimulateStatus("ON")
+
+			return errors.New("-- both account can't sell NOX")
+		}
 	}
 
 	time.Sleep(1 * time.Second)
@@ -185,6 +236,9 @@ func switchAccountRolesSeller() (err error) {
 }
 
 func switchAccountRolesBuyer() (err error) {
+	count := 0
+
+switchAccount:
 	swap := false
 
 	b, err := getBalance(bot.accountTwo.APIKey, bot.accountTwo.APISecret, "ETH")
@@ -192,16 +246,42 @@ func switchAccountRolesBuyer() (err error) {
 		log.Print("unable to get balance", err)
 	}
 
-	t1 := bot.ruleOne.TransactionVolume + (bot.ruleOne.TransactionVolume * bot.ruleOne.VarianceOfTransaction)
-	t2 := bot.ruleTwo.TransactionVolume + (bot.ruleTwo.TransactionVolume * bot.ruleTwo.VarianceOfTransaction)
+	if err != nil || b.Type == "" {
+		bot.running = false
+		insertBotStatus("OFF")
+
+		bot.simulate = true
+		insertBotSimulateStatus("ON")
+
+		return errors.New("-- error unable to get balance buyer")
+	}
+
+	t1 := bot.ruleOne.TransactionVolume + (bot.ruleOne.TransactionVolume * (bot.ruleOne.VarianceOfTransaction / 100.0))
+	t2 := bot.ruleTwo.TransactionVolume + (bot.ruleTwo.TransactionVolume * (bot.ruleTwo.VarianceOfTransaction / 100.0))
 	if b.Value < t1 || b.Value < t2 {
+		log.Print("-- commence switch roles buyer")
 		swap = true
+
+		// increment counter to check if both accounts is invalid
+		count += 1
 	}
 
 	if swap {
 		tmp := bot.accountTwo
 		bot.accountTwo = bot.accountOne
 		bot.accountOne = tmp
+
+		if count == 1 {
+			goto switchAccount
+		} else {
+			bot.running = false
+			insertBotStatus("OFF")
+
+			bot.simulate = true
+			insertBotSimulateStatus("ON")
+
+			return errors.New("-- both account can't buy using ETH")
+		}
 	}
 	return nil
 }
@@ -245,7 +325,7 @@ func sendPayload(method, path string, headers map[string]string, body io.Reader,
 	return err
 }
 
-func insertTransaction(t, pair string, price, quantity float64) {
+func insertTransaction(t, pair string, price, quantity float64, simulate, remarks string) {
 	bp, err := influx.NewBatchPoints(influx.BatchPointsConfig{
 		Database:  "trader",
 		Precision: "s",
@@ -260,11 +340,13 @@ func insertTransaction(t, pair string, price, quantity float64) {
 		"exchange": "livecoin",
 		"pair":     pair,
 		"type":     t,
+		"simulate": simulate,
 	}
 
 	fields := echo.Map{
 		"price":    price,
 		"quantity": quantity,
+		"remarks":  remarks,
 	}
 
 	pt, err := influx.NewPoint("transactions", tags, fields, time.Now())

@@ -60,8 +60,8 @@ func getFee(maker bool) float64 {
 // Returns actual trading fee.
 func getCommission(apiKey, apiSecret string) (struct {
 	Success bool
-	Fee float64
-	}, error){
+	Fee     float64
+}, error) {
 	path := fmt.Sprintf("%s/exchange/commission", LiveCoinAPIURL)
 
 	construct := url.Values{}
@@ -92,6 +92,7 @@ func getTickerAll() (TickerResponse, error) {
 func getTicker(currencyPair string) (TickerResponse, error) {
 	result := TickerResponse{}
 	path := fmt.Sprintf("%s/exchange/ticker?currencyPair=%s", LiveCoinAPIURL, currencyPair)
+	log.Print("-- ", path)
 	return result, sendPayload("GET", path, nil, nil, &result)
 }
 
@@ -156,6 +157,7 @@ func buyLimit(apiKey, apiSecret, currencyPair string, price, quantity float64) (
 		"Content-Length": strconv.Itoa(len(message)),
 	}
 
+	log.Print("-- ", path)
 	data := OrderResponse{}
 	return data, sendPayload("POST", path, headers, strings.NewReader(message), &data)
 }
@@ -179,6 +181,7 @@ func sellLimit(apiKey, apiSecret, currencyPair string, price, quantity float64) 
 		"Content-Length": strconv.Itoa(len(message)),
 	}
 
+	log.Print("-- ", path)
 	data := OrderResponse{}
 	return data, sendPayload("POST", path, headers, strings.NewReader(message), &data)
 }
@@ -255,18 +258,12 @@ func getBalance(apiKey, apiSecret, currency string) (BalanceResponse, error) {
 	message := construct.Encode()
 
 	headers := map[string]string{
-		"API-Key":        apiKey,
-		"Sign":           createSignature(message, apiSecret),
+		"API-Key": apiKey,
+		"Sign":    createSignature(message, apiSecret),
 	}
 
 	path := fmt.Sprintf("%s/payment/balance?%s", LiveCoinAPIURL, message)
-	log.Print("-- ", apiKey)
-	log.Print("-- ", apiSecret)
-	log.Print("-- ", createSignature)
-	log.Print("-- ", headers)
 	log.Print("-- ", path)
-
 	data := BalanceResponse{}
 	return data, sendPayload("GET", path, headers, nil, &data)
 }
-
