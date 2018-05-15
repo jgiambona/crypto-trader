@@ -82,7 +82,7 @@ func pollTicker() {
 							return
 						}
 
-						if err := switchAccountRolesBuyer(targetPrice); err != nil {
+						if err := switchAccountRolesBuyer(targetPrice * quantity); err != nil {
 							log.Print(err)
 							return
 						}
@@ -137,7 +137,7 @@ func pollTicker() {
 							return
 						}
 
-						if err := switchAccountRolesBuyer(targetPrice); err != nil {
+						if err := switchAccountRolesBuyer(targetPrice * quantity); err != nil {
 							log.Print(err)
 							return
 						}
