@@ -1,0 +1,1013 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_INFLUXDB",
+      "label": "influxdb",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "influxdb",
+      "pluginName": "InfluxDB"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "5.0.4"
+    },
+    {
+      "type": "panel",
+      "id": "graph",
+      "name": "Graph",
+      "version": "5.0.0"
+    },
+    {
+      "type": "datasource",
+      "id": "influxdb",
+      "name": "InfluxDB",
+      "version": "5.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "singlestat",
+      "name": "Singlestat",
+      "version": "5.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "table",
+      "name": "Table",
+      "version": "5.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "text",
+      "name": "Text",
+      "version": "5.0.0"
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "${DS_INFLUXDB}",
+        "enable": false,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "limit": 100,
+        "name": "Annotations & Alerts",
+        "showIn": 0,
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": null,
+  "iteration": 1526339247137,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 33,
+      "panels": [],
+      "title": "Graphs",
+      "type": "row"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "${DS_INFLUXDB}",
+      "decimals": null,
+      "fill": 1,
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 15,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "Price",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "stream",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "close"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "alias": "Sell",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "stream",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "ask"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "alias": "Buy",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "stream",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "C",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "bid"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "NOX / ETH - Price History",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "decimals": 8,
+          "format": "currencyUSD",
+          "label": "Market Price",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
+        }
+      ]
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "${DS_INFLUXDB}",
+      "decimals": 4,
+      "description": "Volume base on LiveCoin ticker.",
+      "fill": 2,
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 8
+      },
+      "hideTimeOverride": false,
+      "id": 6,
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "sideWidth": null,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "volume",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "stream",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "volume"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "max"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "exchange",
+              "operator": "=",
+              "value": "livecoin"
+            },
+            {
+              "condition": "AND",
+              "key": "type",
+              "operator": "=",
+              "value": "ticker"
+            }
+          ]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "NOX / ETH - Volume",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "decimals": 2,
+          "format": "short",
+          "label": "Trade Volume",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 15
+      },
+      "id": 31,
+      "panels": [],
+      "title": "Settings",
+      "type": "row"
+    },
+    {
+      "content": "<div id=\"accountsPanel\" class=\"ng-scope\">\n  <script type=\"text/javascript\">\n    $(document).ready(() => {\n      $(\"form#accountOne\").submit(function(event) {\n        event.preventDefault()\n        console.log(\"saving portfolio settings in backend...\")\n        var baseurl = \"[[protocol]]://[[server]]:8000/bot/accounts\"\n        $.ajax({\n          dataType: \"json\",\n          type: \"POST\",\n          url: baseurl,\n          data: $(\"form#accountOne\").serialize(),\n          success: function(data) {\n            console.log(data)\n            $('#accountOnePassword').val('')\n            if (data.success == true) {\n              alert('Account one saved!')\n              console.log('saved.')\n            } else {\n              alert('Account one not saved.')\n              console.log('not saved.')\n            }\n          }\n        })\n      })\n    })\n  </script>\n  <br/>\n  <section>\n    <form id=\"accountOne\" method=\"post\">\n      <input type=\"hidden\" name=\"id\" value=\"1\">\n      <div class=\"gf-form\">\n        <span class=\"gf-form-label width-20\">API Key</span>\n        <input name=\"key\" type=\"text\" class=\"gf-form-input width-20\" placeholder=\"API Key\">\n      </div>\n      <div class=\"gf-form\">\n        <span class=\"gf-form-label width-20\">API Secret</span>\n        <input name=\"secret\" id=\"accountOnePassword\" type=\"password\" class=\"gf-form-input width-20\" placeholder=\"API Secret\">\n      </div>\n      <br/>\n      <button class=\"btn btn-success width-20\" type=\"submit\">Change Account One</button>\n    </form>\n  </section>\n  <br/>\n</div>",
+      "gridPos": {
+        "h": 5,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "id": 10,
+      "links": [],
+      "mode": "html",
+      "title": "Portfolio Account One",
+      "transparent": false,
+      "type": "text"
+    },
+    {
+      "content": "<div id=\"accountsPanel\" class=\"ng-scope\">\n  <script type=\"text/javascript\">\n    $(document).ready(() => {\n      $(\"form#accountTwo\").submit(function(event) {\n        event.preventDefault()\n        console.log(\"saving portfolio settings in backend...\")\n        var baseurl = \"[[protocol]]://[[server]]:8000/bot/accounts\"\n        $.ajax({\n          dataType: \"json\",\n          type: \"POST\",\n          url: baseurl,\n          data: $(\"form#accountTwo\").serialize(),\n          success: function(data) {\n            console.log(data)\n            $('#accountTwoPassword').val('')\n            if (data.success == true) {\n              alert('Account two saved!')\n              console.log('saved.')\n            } else {\n              alert('Account two not saved.')\n              console.log('not saved.')\n            }\n          }\n        })\n      })\n    })\n  </script>\n  <br/>\n  <section>\n    <form id=\"accountTwo\" method=\"post\">\n      <input type=\"hidden\" name=\"id\" value=\"2\">\n      <div class=\"gf-form\">\n        <span class=\"gf-form-label width-20\">API Key</span>\n        <input name=\"key\" type=\"text\" class=\"gf-form-input width-20\" placeholder=\"API Key\">\n      </div>\n      <div class=\"gf-form\">\n        <span class=\"gf-form-label width-20\">API Secret</span>\n        <input name=\"secret\" id=\"accountTwoPassword\" type=\"password\" class=\"gf-form-input width-20\" placeholder=\"API Secret\">\n      </div>\n      <br/>\n      <button class=\"btn btn-success width-20\" type=\"submit\">Change Account Two</button>\n    </form>\n  </section>\n  <br/>\n</div>",
+      "gridPos": {
+        "h": 5,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
+      "id": 35,
+      "links": [],
+      "mode": "html",
+      "title": "Portfolio Account Two",
+      "transparent": false,
+      "type": "text"
+    },
+    {
+      "content": "<section>\n  <script type=\"text/javascript\">\n    $(document).ready(() => {\n      $(\"form#ruleOneConfiguration\").submit(function(event) {\n        event.preventDefault()\n  \n        console.log(\"saving trade settings in backend...\")\n        var baseurl = \"[[protocol]]://[[server]]:8000/bot/settings\"\n        $.ajax({\n          type: \"POST\",\n          url: baseurl,\n          data: $(\"form#ruleOneConfiguration\").serialize(),\n          success: function(data) {\n            console.log(data)\n            if (data.success == true) {\n              alert('Rule one configuration saved!')\n              console.log('saved.')\n            } else {\n              alert('Rule one configuration not saved.')\n              console.log('not saved.')\n            }\n          }\n        })\n      })\n    })\n  </script>\n  <br/>\n  <form id=\"ruleOneConfiguration\" method=\"post\">\n    <input type=\"hidden\" name=\"id\" value=\"1\">\n    <div class=\"gf-form\">\n      <span class=\"gf-form-label width-20\">Interval (e.g. 1s is 1 second)</span>\n      <input name=\"interval\" type=\"text\" class=\"gf-form-input width-20\" value=\"7s\">\n    </div>\n    <div class=\"gf-form\">\n      <span class=\"gf-form-label width-20\">Maximum Volume</span>\n      <input name=\"maximumVolume\" type=\"text\" class=\"gf-form-input width-20\" value=\"500000\">\n    </div>\n    <div class=\"gf-form\">\n      <span class=\"gf-form-label width-20\">Transaction Volume (Per Deal)</span>\n      <input name=\"transactionVolume\" type=\"text\" class=\"gf-form-input width-20\" value=\"300\">\n    </div>\n    <div class=\"gf-form\">\n      <span class=\"gf-form-label width-20\">Variance of Transaction Volume (Percentage)</span>\n      <input name=\"variance\" type=\"text\" class=\"gf-form-input width-20\" value=\"10.0\">\n    </div>\n    <div class=\"gf-form\">\n      <span class=\"gf-form-label width-20\">Bid Price Step Down Amount</span>\n      <input name=\"stepDownPrice\" type=\"text\" class=\"gf-form-input width-20\" value=\"0.00000001\">\n    </div>\n    <div class=\"gf-form\">\n      <span class=\"gf-form-label width-20\">Minimum Bid Price</span>\n      <input name=\"minimumBid\" type=\"text\" class=\"gf-form-input width-20\" value=\"0.00011500\">\n    </div>\n    <br/>\n    <button class=\"btn btn-success width-20\" type=\"submit\">Change Settings</button>\n  </form>\n</section>",
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 21
+      },
+      "id": 25,
+      "links": [],
+      "mode": "html",
+      "title": "Rule One Configuration",
+      "type": "text"
+    },
+    {
+      "content": "<section>\n  <script type=\"text/javascript\">\n    $(document).ready(() => {\n      $(\"form#ruleTwoConfiguration\").submit(function(event) {\n        event.preventDefault()\n  \n        console.log(\"saving trade settings in backend...\")\n        var baseurl = \"[[protocol]]://[[server]]:8000/bot/settings\"\n        $.ajax({\n          type: \"POST\",\n          url: baseurl,\n          data: $(\"form#ruleTwoConfiguration\").serialize(),\n          success: function(data) {\n            console.log(data)\n            if (data.success == true) {\n              alert('Rule two configuration saved!')\n              console.log('saved.')\n            } else {\n              alert('Rule two configuration not saved.')\n              console.log('not saved.')\n            }\n          }\n        })\n      })\n    })\n  </script>\n  <br/>\n  <form id=\"ruleTwoConfiguration\" method=\"post\">\n    <input type=\"hidden\" name=\"id\" value=\"2\">\n    <div class=\"gf-form\">\n      <span class=\"gf-form-label width-20\">Interval (e.g. 1s is 1 second)</span>\n      <input name=\"interval\" type=\"text\" class=\"gf-form-input width-20\" value=\"7s\">\n    </div>\n    <div class=\"gf-form\">\n      <span class=\"gf-form-label width-20\">Maximum Volume</span>\n      <input name=\"maximumVolume\" type=\"text\" class=\"gf-form-input width-20\" value=\"500000\">\n    </div>\n    <div class=\"gf-form\">\n      <span class=\"gf-form-label width-20\">Transaction Volume (Per Deal)</span>\n      <input name=\"transactionVolume\" type=\"text\" class=\"gf-form-input width-20\" value=\"300\">\n    </div>\n    <div class=\"gf-form\">\n      <span class=\"gf-form-label width-20\">Variance of Transaction Volume (Percentage)</span>\n      <input name=\"variance\" type=\"text\" class=\"gf-form-input width-20\" value=\"10.0\">\n    </div>\n    <div class=\"gf-form\">\n      <span class=\"gf-form-label width-20\">Bid Price Step Down Amount</span>\n      <input name=\"stepDownPrice\" type=\"text\" class=\"gf-form-input width-20\" value=\"0.00000001\">\n    </div>\n    <div class=\"gf-form\">\n      <span class=\"gf-form-label width-20\">Minimum Bid Price</span>\n      <input name=\"minimumBid\" type=\"text\" class=\"gf-form-input width-20\" value=\"0.00011500\">\n    </div>\n    <br/>\n    <button class=\"btn btn-success width-20\" type=\"submit\">Change Settings</button>\n  </form>\n</section>",
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 21
+      },
+      "id": 36,
+      "links": [],
+      "mode": "html",
+      "title": "Rule Two Configuration",
+      "type": "text"
+    },
+    {
+      "content": "<section>\n  <script type=\"text/javascript\">\n    $(document).ready(() => {\n      $(\"form#botPowerOneConfiguration\").submit(function(event) {\n        event.preventDefault()\n  \n        console.log(\"saving trade settings in backend...\")\n        var baseurl = \"[[protocol]]://[[server]]:8000/bot/controls\"\n        $.ajax({\n          type: \"POST\",\n          url: baseurl,\n          data: $(\"form#botPowerOneConfiguration\").serialize(),\n          success: function(data) {\n            console.log(data)\n            if (data.success == true) {\n              alert('Bot power config saved!')\n              console.log('saved.')\n            } else {\n              alert('Bot power config not saved.')\n              console.log('not saved.')\n            }\n          }\n        })\n      })\n      $(\"form#botPowerTwoConfiguration\").submit(function(event) {\n        event.preventDefault()\n  \n        console.log(\"saving trade settings in backend...\")\n        var baseurl = \"https://[[server]]:8000/bot/controls\"\n        $.ajax({\n          type: \"POST\",\n          url: baseurl,\n          data: $(\"form#botPowerTwoConfiguration\").serialize(),\n          success: function(data) {\n            console.log(data)\n            if (data.success == true) {\n              alert('Bot power config saved!')\n              console.log('saved.')\n            } else {\n              alert('Bot power config not saved.')\n              console.log('not saved.')\n            }\n          }\n        })\n      })\n    })\n  </script>\n  <br/>\n  <form id=\"botPowerOneConfiguration\" method=\"post\">\n    <input type=\"hidden\" name=\"power\" value=\"1\">\n    <button class=\"btn btn-success width-20\" type=\"submit\">On</button>\n  </form>\n  <br/>\n  <form id=\"botPowerTwoConfiguration\" method=\"post\">\n    <input type=\"hidden\" name=\"power\" value=\"0\">\n    <button class=\"btn btn-warning width-20\" type=\"submit\">Off</button>\n  </form>\n</section>",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 30
+      },
+      "id": 38,
+      "links": [],
+      "mode": "html",
+      "title": "Bot Control",
+      "type": "text"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "${DS_INFLUXDB}",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 6,
+        "y": 30
+      },
+      "id": 40,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "last",
+      "targets": [
+        {
+          "groupBy": [],
+          "measurement": "bot",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "table",
+          "select": [
+            [
+              {
+                "params": [
+                  "Status"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "set",
+              "operator": "=",
+              "value": "bot"
+            },
+            {
+              "condition": "AND",
+              "key": "type",
+              "operator": "=",
+              "value": "power"
+            }
+          ]
+        }
+      ],
+      "thresholds": "",
+      "title": "Bot Status",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "${DS_INFLUXDB}",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 9,
+        "y": 30
+      },
+      "id": 42,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "last",
+      "targets": [
+        {
+          "groupBy": [],
+          "measurement": "bot",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "table",
+          "select": [
+            [
+              {
+                "params": [
+                  "Status"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "set",
+              "operator": "=",
+              "value": "bot"
+            },
+            {
+              "condition": "AND",
+              "key": "type",
+              "operator": "=",
+              "value": "simulate"
+            }
+          ]
+        }
+      ],
+      "thresholds": "",
+      "title": "Bot Simulate",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "content": "<section>\n  <script type=\"text/javascript\">\n    $(document).ready(() => {\n      $(\"form#botSimulateOneConfiguration\").submit(function(event) {\n        event.preventDefault()\n  \n        console.log(\"saving trade settings in backend...\")\n        var baseurl = \"[[protocol]]://[[server]]:8000/bot/simulate\"\n        $.ajax({\n          type: \"POST\",\n          url: baseurl,\n          data: $(\"form#botSimulateOneConfiguration\").serialize(),\n          success: function(data) {\n            console.log(data)\n            if (data.success == true) {\n              alert('Bot simulate config saved!')\n              console.log('saved.')\n            } else {\n              alert('Bot simulate config not saved.')\n              console.log('not saved.')\n            }\n          }\n        })\n      })\n      $(\"form#botSimulateTwoConfiguration\").submit(function(event) {\n        event.preventDefault()\n  \n        console.log(\"saving trade settings in backend...\")\n        var baseurl = \"http://[[server]]:8000/bot/simulate\"\n        $.ajax({\n          type: \"POST\",\n          url: baseurl,\n          data: $(\"form#botSimulateTwoConfiguration\").serialize(),\n          success: function(data) {\n            console.log(data)\n            if (data.success == true) {\n              alert('Bot simulate config saved!')\n              console.log('saved.')\n            } else {\n              alert('Bot simulate config not saved.')\n              console.log('not saved.')\n            }\n          }\n        })\n      })\n    })\n  </script>\n  <br/>\n  <form id=\"botSimulateOneConfiguration\" method=\"post\">\n    <input type=\"hidden\" name=\"power\" value=\"1\">\n    <button class=\"btn btn-success width-20\" type=\"submit\">On</button>\n  </form>\n  <br/>\n  <form id=\"botSimulateTwoConfiguration\" method=\"post\">\n    <input type=\"hidden\" name=\"power\" value=\"0\">\n    <button class=\"btn btn-warning width-20\" type=\"submit\">Off</button>\n  </form>\n</section>",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 30
+      },
+      "id": 41,
+      "links": [],
+      "mode": "html",
+      "title": "Bot Simulate Control",
+      "type": "text"
+    },
+    {
+      "content": "<section>\n  <br/>\n  <form action=\"http://[[server]]:8000/bot/exported\" method=\"get\">\n    <button class=\"btn btn-success width-20\" type=\"submit\">Export CSV File</button>\n  </form>\n  <br/>\n</section>",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 30
+      },
+      "id": 43,
+      "links": [],
+      "mode": "html",
+      "title": "Bot Export",
+      "type": "text"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 34
+      },
+      "id": 29,
+      "panels": [],
+      "title": "Information",
+      "type": "row"
+    },
+    {
+      "columns": [],
+      "datasource": "${DS_INFLUXDB}",
+      "fontSize": "100%",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 35
+      },
+      "id": 4,
+      "links": [],
+      "pageSize": null,
+      "scroll": true,
+      "showHeader": true,
+      "sort": {
+        "col": 0,
+        "desc": true
+      },
+      "styles": [
+        {
+          "alias": "Time",
+          "dateFormat": "YYYY-MM-DD HH:mm:ss.SSS",
+          "pattern": "Time",
+          "type": "date"
+        },
+        {
+          "alias": "Exchange",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "pattern": "transactions.exchange",
+          "preserveFormat": false,
+          "sanitize": false,
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        },
+        {
+          "alias": "Currency Pair",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "pattern": "transactions.pair",
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        },
+        {
+          "alias": "Last Price",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 8,
+          "pattern": "transactions.price",
+          "thresholds": [],
+          "type": "number",
+          "unit": "currencyUSD"
+        },
+        {
+          "alias": "Quantity",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 8,
+          "pattern": "transactions.quantity",
+          "thresholds": [],
+          "type": "number",
+          "unit": "none"
+        },
+        {
+          "alias": "Transaction Type",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "link": false,
+          "pattern": "transactions.type",
+          "preserveFormat": false,
+          "sanitize": false,
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        },
+        {
+          "alias": "Remarks",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "pattern": "transactions.remarks",
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        },
+        {
+          "alias": "Simulate",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "pattern": "transactions.simulate",
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        },
+        {
+          "alias": "",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "decimals": 2,
+          "pattern": "/.*/",
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        }
+      ],
+      "targets": [
+        {
+          "groupBy": [],
+          "measurement": "transactions",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "*"
+                ],
+                "type": "field"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "title": "Trader Bot Action Logs",
+      "transform": "timeseries_to_columns",
+      "type": "table"
+    }
+  ],
+  "refresh": "15s",
+  "schemaVersion": 16,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "allValue": null,
+        "current": {
+          "selected": true,
+          "tags": [],
+          "text": "localhost",
+          "value": "localhost"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "Server Type",
+        "multi": false,
+        "name": "server",
+        "options": [
+          {
+            "selected": true,
+            "text": "localhost",
+            "value": "localhost"
+          },
+          {
+            "selected": false,
+            "text": "trade-bot.smartfunding.io",
+            "value": "trade-bot.smartfunding.io"
+          }
+        ],
+        "query": "localhost, trade-bot.smartfunding.io",
+        "type": "custom"
+      },
+      {
+        "allValue": null,
+        "current": {
+          "text": "http",
+          "value": "http"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "Protocol",
+        "multi": false,
+        "name": "protocol",
+        "options": [
+          {
+            "selected": false,
+            "text": "https",
+            "value": "https"
+          },
+          {
+            "selected": true,
+            "text": "http",
+            "value": "http"
+          }
+        ],
+        "query": "https,http",
+        "type": "custom"
+      }
+    ]
+  },
+  "time": {
+    "from": "now/d",
+    "to": "now/d"
+  },
+  "timepicker": {
+    "hidden": false,
+    "refresh_intervals": [
+      "1s",
+      "30s",
+      "1m",
+      "5m",
+      "15m"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  },
+  "timezone": "browser",
+  "title": "Trader Bot",
+  "uid": "A_yLIgWiz",
+  "version": 91
+}
