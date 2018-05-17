@@ -71,7 +71,7 @@ func pollTicker() {
 
 						log.Printf("--- %.8f %0.8f", lowest, volume)
 
-						v := bot.ruleOne.TransactionVolume * 0.10
+						v := bot.ruleOne.TransactionVolume * (bot.ruleOne.VarianceOfTransaction / 100.0)
 						quantity := bot.ruleOne.TransactionVolume + getRandom(v)
 						targetPrice := lowest - bot.ruleOne.BidPriceStepDown
 
@@ -126,8 +126,8 @@ func pollTicker() {
 
 						log.Printf("--- %.8f %0.8f", lowest, volume)
 
-						v := bot.ruleOne.TransactionVolume * 0.10
-						quantity := bot.ruleOne.TransactionVolume + getRandom(v)
+						v := bot.ruleTwo.TransactionVolume * (bot.ruleTwo.VarianceOfTransaction / 100.0)
+						quantity := bot.ruleTwo.TransactionVolume + getRandom(v)
 						targetPrice := lowest - bot.ruleTwo.BidPriceStepDown
 
 						log.Printf("--- %.8f %0.8f", targetPrice, quantity)
