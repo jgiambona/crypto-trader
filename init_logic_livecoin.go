@@ -33,6 +33,20 @@ type (
 		Value    float64 `json:"value"`
 	}
 
+	OrderDetailResponse struct {
+		ID                int64   `json:"id"`
+		ClientID          int64   `json:"client_id"`
+		Status            string  `json:"status"`
+		Symbol            string  `json:"symbol"`
+		Price             float64 `json:"price"`
+		Quantity          float64 `json:"quantity"`
+		RemainingQuantity float64 `json:"remaining_quantity"`
+		Blocked           float64 `json:"blocked"`
+		BlockedRemain     float64 `json:"blocked_remain"`
+		CommissionRate    float64 `json:"commission_rate"`
+		Trades            []int64 `json:"trades"`
+	}
+
 	// TickerResponse stores the pricing information.
 	TickerResponse struct {
 		Currency     string  `json:"cur"`
@@ -96,46 +110,21 @@ func getTicker(currencyPair string) (TickerResponse, error) {
 	return result, sendPayload("GET", path, nil, nil, &result)
 }
 
-// Get a detailed review on the latest transactions for
-// requested currency pair. You may receive the update for the last hour or
-// for the last minute.
-func getLastTrades(currencyPair, minutesOrHour, tradeType string) {
-	path := fmt.Sprintf("%s/exchange/last_trades", LiveCoinAPIURL)
-	if err := sendPayload("GET", path, nil, nil, nil); err != nil {
-		log.Printf("%s", err.Error())
+// Get the order information by its ID.
+func getOrder(apiKey, apiSecret, orderId string) (OrderDetailResponse, error) {
+	construct := url.Values{}
+	construct.Add("orderId", orderId)
+	message := construct.Encode()
+
+	headers := map[string]string{
+		"API-Key": apiKey,
+		"Sign":    createSignature(message, apiSecret),
 	}
-}
 
-// Get the orderbook for specified currency pair (you may
-// enable the feature of grouping orders by price).
-func getOrderBook(currencyPair, groupByPrice string, depth int64) {
-	path := fmt.Sprintf("%s/exchange/order_book", LiveCoinAPIURL)
-	sendPayload("GET", path, nil, nil, nil)
-}
-
-// Returns orderbook for every currency pair.
-func getAllOrderBook(groupByPrice string, depth int64) {
-	path := fmt.Sprintf("%s/exchange/all/order_book", LiveCoinAPIURL)
-	sendPayload("GET", path, nil, nil, nil)
-}
-
-// Returns maximum bid and minimum ask in the current orderbook.
-func getMaxBidMinAsk(currencyPair string) {
-	path := fmt.Sprintf("%s/exchange/maxbid_minask", LiveCoinAPIURL)
-	sendPayload("GET", path, nil, nil, nil)
-}
-
-// Returns the limit for minimum amount to open order, for each
-// pair. Also returns maximum number of digits after the decimal point in price value.
-func getRestrictions() {
-	path := fmt.Sprintf("%s/exchange/restrictions", LiveCoinAPIURL)
-	fmt.Println(path)
-}
-
-// Returns public data for currencies.
-func getCoinInfo() {
-	path := fmt.Sprintf("%s/info/coinInfo", LiveCoinAPIURL)
-	sendPayload("GET", path, nil, nil, nil)
+	path := fmt.Sprintf("%s/exchange/order?%s", LiveCoinAPIURL, message)
+	log.Print("-- ", path)
+	data := OrderDetailResponse{}
+	return data, sendPayload("GET", path, headers, nil, &data)
 }
 
 // Open a buy order (limit) for particular currency pair.
@@ -182,50 +171,6 @@ func sellLimit(apiKey, apiSecret, currencyPair string, price, quantity float64) 
 	}
 
 	log.Print("-- ", path)
-	data := OrderResponse{}
-	return data, sendPayload("POST", path, headers, strings.NewReader(message), &data)
-}
-
-// Open a buy order (market) of specified amount for
-// particular currency pair.
-func buyMarket(apiKey, apiSecret, currencyPair string, quantity float64) (OrderResponse, error) {
-	path := fmt.Sprintf("%s/exchange/buymarket", LiveCoinAPIURL)
-
-	q := strconv.FormatFloat(quantity, 'f', 8, 64)
-	construct := url.Values{}
-	construct.Add("currencyPair", currencyPair)
-	construct.Add("quantity", q)
-	message := construct.Encode()
-
-	headers := map[string]string{
-		"API-Key":        apiKey,
-		"Sign":           createSignature(message, apiSecret),
-		"Content-Type":   "application/x-www-form-urlencoded",
-		"Content-Length": strconv.Itoa(len(message)),
-	}
-
-	data := OrderResponse{}
-	return data, sendPayload("POST", path, headers, strings.NewReader(message), &data)
-}
-
-// Open a sell order (market) for specified amount of
-// selected currency pair.
-func sellMarket(apiKey, apiSecret, currencyPair string, quantity float64) (OrderResponse, error) {
-	path := fmt.Sprintf("%s/exchange/sellmarket", LiveCoinAPIURL)
-
-	q := strconv.FormatFloat(quantity, 'f', 8, 64)
-	construct := url.Values{}
-	construct.Add("currencyPair", currencyPair)
-	construct.Add("quantity", q)
-	message := construct.Encode()
-
-	headers := map[string]string{
-		"API-Key":        apiKey,
-		"Sign":           createSignature(message, apiSecret),
-		"Content-Type":   "application/x-www-form-urlencoded",
-		"Content-Length": strconv.Itoa(len(message)),
-	}
-
 	data := OrderResponse{}
 	return data, sendPayload("POST", path, headers, strings.NewReader(message), &data)
 }
