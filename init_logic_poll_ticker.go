@@ -124,6 +124,39 @@ func pollTicker() {
 									strconv.FormatBool(bot.simulate), remarks)
 							}
 
+							if !bot.simulate {
+								c, err := getOrder(bot.accountOne.APIKey, bot.accountOne.APISecret,
+									string(placedOrder))
+								if err != nil {
+									log.Print("error occurred in cancelling order")
+								}
+
+								// Cancel if not aligned in target price and quantity
+								if c.RemainingQuantity != tradeQuantity || c.Price != tradePrice {
+									remarks := bot.accountOne.APIKey
+
+									c, err := cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
+										currencyPair, placedOrder)
+
+									if err != nil {
+										log.Print("error occurred in cancelling order")
+										remarks = fmt.Sprintf("Error on %s", bot.accountOne.APIKey)
+									}
+
+									if !c.Success {
+										log.Print("unable to cancel order")
+									}
+
+									// Record cancel order
+									insertTransaction("CANCEL", "nox_eth", tradePrice, tradeQuantity,
+										strconv.FormatBool(bot.simulate), remarks)
+									placedOrder = -1
+
+									// Repeat
+									goto repeatCheckLowestBid
+								}
+							}
+
 							// Check if the lowest is the trade price and check
 							if lowest >= tradePrice && tradePrice > 0 && placedOrder > 0 {
 								remarks := bot.accountTwo.APIKey
