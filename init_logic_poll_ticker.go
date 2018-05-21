@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"log"
 	"math/rand"
+	"math/big"
 	"net/http"
 	"strconv"
 	"strings"
@@ -125,14 +126,21 @@ func pollTicker() {
 							}
 
 							if !bot.simulate && placedOrder > 1 {
+								log.Print("-- ", placedOrder)
 								c, err := getOrder(bot.accountOne.APIKey, bot.accountOne.APISecret,
-									string(placedOrder))
+									strconv.FormatInt(placedOrder, 10))
 								if err != nil {
 									log.Print("error occurred in cancelling order")
 								}
 
 								// Cancel if not aligned in target price and quantity
-								if c.RemainingQuantity != tradeQuantity || c.Price != tradePrice {
+								qs := big.NewFloat(tradeQuantity).SetMode(big.AwayFromZero).Text('f', 2)
+								qr :=  big.NewFloat(c.RemainingQuantity).SetMode(big.AwayFromZero).Text('f', 2)
+								log.Print("-- ", qs)
+								log.Print("-- ", qr)
+								log.Print("-- ", tradePrice)
+								log.Print("-- ", c.Price)
+								if qr != qs || c.Price != tradePrice {
 									remarks := bot.accountOne.APIKey
 
 									c, err := cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
@@ -275,14 +283,21 @@ func pollTicker() {
 							}
 
 							if !bot.simulate && placedOrder > 1 {
+								log.Print("-- ", placedOrder)
 								c, err := getOrder(bot.accountOne.APIKey, bot.accountOne.APISecret,
-									string(placedOrder))
+									strconv.FormatInt(placedOrder, 10))
 								if err != nil {
 									log.Print("error occurred in cancelling order")
 								}
 
 								// Cancel if not aligned in target price and quantity
-								if c.RemainingQuantity != tradeQuantity || c.Price != tradePrice {
+								qs := big.NewFloat(tradeQuantity).SetMode(big.AwayFromZero).Text('f', 2)
+								qr :=  big.NewFloat(c.RemainingQuantity).SetMode(big.AwayFromZero).Text('f', 2)
+								log.Print("-- ", qs)
+								log.Print("-- ", qr)
+								log.Print("-- ", tradePrice)
+								log.Print("-- ", c.Price)
+								if qr != qs || c.Price != tradePrice {
 									remarks := bot.accountOne.APIKey
 
 									c, err := cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
