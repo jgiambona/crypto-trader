@@ -100,7 +100,7 @@ func pollTicker() {
 							if botVolume < bot.ruleOne.MaximumVolume {
 								botVolume += quantity
 
-								remarks := bot.accountTwo.APIKey
+								remarks := bot.accountOne.APIKey
 
 								if !bot.simulate {
 									o, err := sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
