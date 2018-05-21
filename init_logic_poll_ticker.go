@@ -124,7 +124,7 @@ func pollTicker() {
 									strconv.FormatBool(bot.simulate), remarks)
 							}
 
-							if !bot.simulate {
+							if !bot.simulate && placedOrder > 1 {
 								c, err := getOrder(bot.accountOne.APIKey, bot.accountOne.APISecret,
 									string(placedOrder))
 								if err != nil {
@@ -274,7 +274,7 @@ func pollTicker() {
 								goto repeatCheckLowestBid
 							}
 
-							if !bot.simulate {
+							if !bot.simulate && placedOrder > 1 {
 								c, err := getOrder(bot.accountOne.APIKey, bot.accountOne.APISecret,
 									string(placedOrder))
 								if err != nil {
