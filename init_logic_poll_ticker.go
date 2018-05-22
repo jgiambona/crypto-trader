@@ -131,9 +131,12 @@ func pollTicker() {
 									log.Print(err)
 								}
 
-								qs := big.NewFloat(tradeQuantity).SetMode(big.AwayFromZero).Text('f', 8)
+								qrl := len(o.Asks[0][1])
+								qs := big.NewFloat(tradeQuantity).SetMode(big.AwayFromZero).Text('f', 8)[0:qrl]
 								qr := o.Asks[0][1]
-								tp := big.NewFloat(tradePrice).SetMode(big.AwayFromZero).Text('f', 8)
+
+								tcl := len(o.Asks[0][0])
+								tp := big.NewFloat(tradePrice).SetMode(big.AwayFromZero).Text('f', 8)[0:tcl]
 								tc := o.Asks[0][0]
 
 								log.Print("-- ", qs)
@@ -331,9 +334,12 @@ func pollTicker() {
 									log.Print(err)
 								}
 
-								qs := big.NewFloat(tradeQuantity).SetMode(big.AwayFromZero).Text('f', 8)
+								qrl := len(o.Asks[0][1])
+								qs := big.NewFloat(tradeQuantity).SetMode(big.AwayFromZero).Text('f', 8)[0:qrl]
 								qr := o.Asks[0][1]
-								tp := big.NewFloat(tradePrice).SetMode(big.AwayFromZero).Text('f', 8)
+
+								tcl := len(o.Asks[0][0])
+								tp := big.NewFloat(tradePrice).SetMode(big.AwayFromZero).Text('f', 8)[0:tcl]
 								tc := o.Asks[0][0]
 
 								log.Print("-- ", qs)

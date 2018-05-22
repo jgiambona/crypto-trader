@@ -67,6 +67,9 @@ func TestGetOrderBook(t *testing.T) {
 	log.Print("-- ", path)
 	data := OrderBookResponse{}
 	err := sendPayload("GET", path, nil, nil, &data)
+	c := len(data.Asks[0][0])
+	t.Logf("%#+v", c)
 	t.Logf("%#+v", data.Asks[0][0])
+	t.Logf("%#+v", data.Asks[0][0][0:c])
 	assert.NotNil(t, err)
 }
