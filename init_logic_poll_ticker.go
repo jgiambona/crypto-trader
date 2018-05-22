@@ -325,6 +325,46 @@ func pollTicker() {
 								goto repeatCheckLowestBid
 							}
 
+							{
+								o, err := getOrderBook(currencyPair)
+								if err != nil {
+									log.Print(err)
+								}
+
+								qs := big.NewFloat(tradeQuantity).SetMode(big.AwayFromZero).Text('f', 8)
+								qr := o.Asks[0][1]
+								tp := big.NewFloat(tradePrice).SetMode(big.AwayFromZero).Text('f', 8)
+								tc := o.Asks[0][0]
+
+								log.Print("-- ", qs)
+								log.Print("-- ", qr)
+								log.Print("-- ", tp)
+								log.Print("-- ", tc)
+								if qr != qs || tc != tp {
+									remarks := bot.accountOne.APIKey
+
+									c, err := cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
+										currencyPair, placedOrder)
+
+									if err != nil {
+										log.Print("error occurred in cancelling order")
+										remarks = fmt.Sprintf("Error on %s", bot.accountOne.APIKey)
+									}
+
+									if !c.Success {
+										log.Print("unable to cancel order")
+									}
+
+									// Record cancel order
+									insertTransaction("CANCEL", "nox_eth", tradePrice, tradeQuantity,
+										strconv.FormatBool(bot.simulate), remarks)
+									placedOrder = -1
+
+									// Repeat
+									goto repeatCheckLowestBid
+								}
+							}
+
 							if !bot.simulate && placedOrder > 1 {
 								log.Print("-- ", placedOrder)
 								c, err := getOrder(bot.accountOne.APIKey, bot.accountOne.APISecret,
