@@ -131,10 +131,10 @@ func pollTicker() {
 									log.Print(err)
 								}
 
-								qs := big.NewFloat(tradeQuantity).SetMode(big.AwayFromZero).Text('f', 7)
-								qr := o.Asks[0][0]
-								tp := big.NewFloat(tradePrice).SetMode(big.AwayFromZero).Text('f', 7)
-								tc := o.Asks[0][1]
+								qs := big.NewFloat(tradeQuantity).SetMode(big.AwayFromZero).Text('f', 8)
+								qr := o.Asks[0][1]
+								tp := big.NewFloat(tradePrice).SetMode(big.AwayFromZero).Text('f', 8)
+								tc := o.Asks[0][0]
 
 								log.Print("-- ", qs)
 								log.Print("-- ", qr)
