@@ -134,13 +134,16 @@ func pollTicker() {
 								}
 
 								// Cancel if not aligned in target price and quantity
-								qs := big.NewFloat(tradeQuantity).SetMode(big.AwayFromZero).Text('f', 2)
-								qr :=  big.NewFloat(c.RemainingQuantity).SetMode(big.AwayFromZero).Text('f', 2)
+								qs := big.NewFloat(tradeQuantity).SetMode(big.AwayFromZero).Text('f', 7)
+								qr := big.NewFloat(c.RemainingQuantity).SetMode(big.AwayFromZero).Text('f', 7)
+								tp := big.NewFloat(tradePrice).SetMode(big.AwayFromZero).Text('f', 7)
+								tc := big.NewFloat(c.Price).SetMode(big.AwayFromZero).Text('f', 7)
+
 								log.Print("-- ", qs)
 								log.Print("-- ", qr)
-								log.Print("-- ", tradePrice)
-								log.Print("-- ", c.Price)
-								if qr != qs || c.Price != tradePrice {
+								log.Print("-- ", tp)
+								log.Print("-- ", tc)
+								if qr != qs || tc != tp {
 									remarks := bot.accountOne.APIKey
 
 									c, err := cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
@@ -291,13 +294,16 @@ func pollTicker() {
 								}
 
 								// Cancel if not aligned in target price and quantity
-								qs := big.NewFloat(tradeQuantity).SetMode(big.AwayFromZero).Text('f', 2)
-								qr :=  big.NewFloat(c.RemainingQuantity).SetMode(big.AwayFromZero).Text('f', 2)
+								qs := big.NewFloat(tradeQuantity).SetMode(big.AwayFromZero).Text('f', 7)
+								qr := big.NewFloat(c.RemainingQuantity).SetMode(big.AwayFromZero).Text('f', 7)
+								tp := big.NewFloat(tradePrice).SetMode(big.AwayFromZero).Text('f', 7)
+								tc := big.NewFloat(c.Price).SetMode(big.AwayFromZero).Text('f', 7)
+
 								log.Print("-- ", qs)
 								log.Print("-- ", qr)
-								log.Print("-- ", tradePrice)
-								log.Print("-- ", c.Price)
-								if qr != qs || c.Price != tradePrice {
+								log.Print("-- ", tp)
+								log.Print("-- ", tc)
+								if qr != qs || tc != tp {
 									remarks := bot.accountOne.APIKey
 
 									c, err := cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
