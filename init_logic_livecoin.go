@@ -138,6 +138,7 @@ func getOrderBook(currencyPair string) (OrderBookResponse, error) {
 	construct := url.Values{}
 	construct.Add("currencyPair", currencyPair)
 	construct.Add("depth", "4")
+	construct.Add("groupByPrice", "true")
 	message := construct.Encode()
 
 	path := fmt.Sprintf("%s/exchange/order_book?%s", LiveCoinAPIURL, message)
