@@ -47,6 +47,12 @@ type (
 		Trades            []int64 `json:"trades"`
 	}
 
+	OrderBookResponse struct {
+		Timestamp int64      `json:"timestamp"`
+		Asks      [][]string `json:"asks"`
+		Bids      [][]string `json:"bids"`
+	}
+
 	// TickerResponse stores the pricing information.
 	TickerResponse struct {
 		Currency     string  `json:"cur"`
@@ -125,6 +131,19 @@ func getOrder(apiKey, apiSecret, orderId string) (OrderDetailResponse, error) {
 	log.Print("-- ", path)
 	data := OrderDetailResponse{}
 	return data, sendPayload("GET", path, headers, nil, &data)
+}
+
+// Get the order book list.
+func getOrderBook(currencyPair string) (OrderBookResponse, error) {
+	construct := url.Values{}
+	construct.Add("currencyPair", currencyPair)
+	construct.Add("depth", "4")
+	message := construct.Encode()
+
+	path := fmt.Sprintf("%s/exchange/order_book?%s", LiveCoinAPIURL, message)
+	log.Print("-- ", path)
+	data := OrderBookResponse{}
+	return data, sendPayload("GET", path, nil, nil, &data)
 }
 
 // Open a buy order (limit) for particular currency pair.

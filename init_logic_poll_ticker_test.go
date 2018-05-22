@@ -38,3 +38,35 @@ func TestBuy(t *testing.T) {
 	}
 	log.Printf("Hello World")
 }
+
+func TestGetOrder(t *testing.T) {
+	construct := url.Values{}
+	construct.Add("orderId", string(7392549951))
+	message := construct.Encode()
+
+	headers := map[string]string{
+		"API-Key": "bVFxGcKEawAWeRR6je5jpVTF8jP3Qm47",
+		"Sign":    createSignature(message, "iwqhegnHSq3Y14VVPVY1AFMDfGgGYKEhF"),
+	}
+
+	path := fmt.Sprintf("%s/exchange/order?%s", LiveCoinAPIURL, message)
+	log.Print("-- ", path)
+	data := OrderDetailResponse{}
+	err := sendPayload("GET", path, headers, nil, &data)
+	t.Logf("+%v", data)
+	assert.NotNil(t, err)
+}
+
+func TestGetOrderBook(t *testing.T) {
+	construct := url.Values{}
+	construct.Add("currencyPair", "NOX/ETH")
+	construct.Add("depth", "4")
+	message := construct.Encode()
+
+	path := fmt.Sprintf("%s/exchange/order_book?%s", LiveCoinAPIURL, message)
+	log.Print("-- ", path)
+	data := OrderBookResponse{}
+	err := sendPayload("GET", path, nil, nil, &data)
+	t.Logf("%#+v", data.Asks[0][0])
+	assert.NotNil(t, err)
+}
