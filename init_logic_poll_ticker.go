@@ -124,33 +124,6 @@ func pollTicker() {
 									strconv.FormatBool(bot.simulate), remarks)
 							}
 
-							if lowest != tradePrice && placedOrder > 0 {
-								remarks := bot.accountOne.APIKey
-
-								// Check if bot is in simulation mode
-								if !bot.simulate {
-
-									c, err := cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
-										currencyPair, placedOrder)
-
-									if err != nil {
-										log.Print("error occurred in cancelling order")
-										remarks = fmt.Sprintf("Error on %s", bot.accountOne.APIKey)
-									}
-
-									if !c.Success {
-										log.Print("unable to cancel order")
-									}
-								}
-
-								// Record cancel order
-								insertTransaction("CANCEL", "nox_eth", tradePrice, tradeQuantity,
-									strconv.FormatBool(bot.simulate), remarks)
-								placedOrder = -1
-
-								// Repeat
-								goto repeatCheckLowestBid
-							}
 
 							if placedOrder > 0 {
 								o, err := getOrderBook(currencyPair)
@@ -159,18 +132,24 @@ func pollTicker() {
 								}
 
 								qrl := len(o.Asks[0][1])
-								qs := big.NewFloat(tradeQuantity).SetMode(big.AwayFromZero).Text('f', 8)[0:qrl]
+								qs := big.NewFloat(tradeQuantity).SetMode(big.AwayFromZero).Text('f', 8)
 								qr := o.Asks[0][1]
-
-								tcl := len(o.Asks[0][0])
-								tp := big.NewFloat(tradePrice).SetMode(big.AwayFromZero).Text('f', 8)[0:tcl]
-								tc := o.Asks[0][0]
-
+								if len(qs) > len(qr) {
+									qs = big.NewFloat(tradeQuantity).SetMode(big.AwayFromZero).Text('f', 8)[0:qrl]
+								}
 								log.Print("-- ", qs)
 								log.Print("-- ", qr)
+
+								tcl := len(o.Asks[0][0])
+								tp := big.NewFloat(tradePrice).SetMode(big.AwayFromZero).Text('f', 8)
+								tc := o.Asks[0][0]
+								if len(tp) > len(tc) {
+									tp = big.NewFloat(tradePrice).SetMode(big.AwayFromZero).Text('f', 8)[0:tcl]
+								}
 								log.Print("-- ", tp)
 								log.Print("-- ", tc)
-								if qr != qs || tc != tp {
+
+								if qr != qs || tc != tp || lowest < tradePrice {
 									remarks := bot.accountOne.APIKey
 
 									c, err := cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
@@ -191,6 +170,7 @@ func pollTicker() {
 									placedOrder = -1
 
 									// Repeat
+									time.Sleep(time.Duration(bot.ruleOne.MinInterval.Nanoseconds()))
 									goto repeatCheckLowestBid
 								}
 							}
@@ -234,6 +214,7 @@ func pollTicker() {
 									placedOrder = -1
 
 									// Repeat
+									time.Sleep(time.Duration(bot.ruleOne.MinInterval.Nanoseconds()))
 									goto repeatCheckLowestBid
 								}
 							}
