@@ -18,8 +18,6 @@ type (
 		accountOne             Account
 		accountTwo             Account
 		ruleOne                RuleConfiguration
-		ruleTwo                RuleConfiguration
-		ruleThree              RuleConfiguration
 		running                bool
 		simulate               bool
 		availableCurrencyPairs []string
@@ -53,28 +51,13 @@ func main() {
 	bot.accountTwo.APIKey = "bot"
 
 	bot.ruleOne.Enabled = true
-	bot.ruleOne.Interval = time.Duration(7 * time.Second)
+	bot.ruleOne.MinInterval = time.Duration(7 * time.Second)
+	bot.ruleOne.MaxInterval = time.Duration(10 * time.Second)
 	bot.ruleOne.MaximumVolume = 50000.0
 	bot.ruleOne.TransactionVolume = 300.0
 	bot.ruleOne.VarianceOfTransaction = 10.0
 	bot.ruleOne.BidPriceStepDown = 0.00000001
 	bot.ruleOne.MinimumBid = 0.00001
-
-	bot.ruleTwo.Enabled = true
-	bot.ruleTwo.Interval = time.Duration(7 * time.Second)
-	bot.ruleTwo.MaximumVolume = 50000.0
-	bot.ruleTwo.TransactionVolume = 300.0
-	bot.ruleTwo.VarianceOfTransaction = 10.0
-	bot.ruleTwo.BidPriceStepDown = 0.00000001
-	bot.ruleTwo.MinimumBid = 0.00001
-
-	bot.ruleThree.Enabled = true
-	bot.ruleThree.Interval = time.Duration(7 * time.Second)
-	bot.ruleThree.MaximumVolume = 50000.0
-	bot.ruleThree.TransactionVolume = 300.0
-	bot.ruleThree.VarianceOfTransaction = 10.0
-	bot.ruleThree.BidPriceStepDown = 0.00000001
-	bot.ruleThree.MinimumBid = 0.00001
 
 	loadRoutes(e)
 

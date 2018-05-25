@@ -61,7 +61,6 @@ func pollTicker() {
 				if len(bot.accountOne.APIKey) > 0 && len(bot.accountTwo.APIKey) > 0 {
 
 					// In each loop reset this values.
-					tradePlace := false
 					tradePrice := -1.0
 					tradeQuantity := -1.0
 
@@ -125,181 +124,6 @@ func pollTicker() {
 									strconv.FormatBool(bot.simulate), remarks)
 							}
 
-							{
-								o, err := getOrderBook(currencyPair)
-								if err != nil {
-									log.Print(err)
-								}
-
-								qrl := len(o.Asks[0][1])
-								qs := big.NewFloat(tradeQuantity).SetMode(big.AwayFromZero).Text('f', 8)[0:qrl]
-								qr := o.Asks[0][1]
-
-								tcl := len(o.Asks[0][0])
-								tp := big.NewFloat(tradePrice).SetMode(big.AwayFromZero).Text('f', 8)[0:tcl]
-								tc := o.Asks[0][0]
-
-								log.Print("-- ", qs)
-								log.Print("-- ", qr)
-								log.Print("-- ", tp)
-								log.Print("-- ", tc)
-								if qr != qs || tc != tp {
-									remarks := bot.accountOne.APIKey
-
-									c, err := cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
-										currencyPair, placedOrder)
-
-									if err != nil {
-										log.Print("error occurred in cancelling order")
-										remarks = fmt.Sprintf("Error on %s", bot.accountOne.APIKey)
-									}
-
-									if !c.Success {
-										log.Print("unable to cancel order")
-									}
-
-									// Record cancel order
-									insertTransaction("CANCEL", "nox_eth", tradePrice, tradeQuantity,
-										strconv.FormatBool(bot.simulate), remarks)
-									placedOrder = -1
-
-									// Repeat
-									goto repeatCheckLowestBid
-								}
-							}
-
-							if !bot.simulate && placedOrder > 1 {
-								log.Print("-- ", placedOrder)
-								c, err := getOrder(bot.accountOne.APIKey, bot.accountOne.APISecret,
-									strconv.FormatInt(placedOrder, 10))
-								if err != nil {
-									log.Print("error occurred in cancelling order")
-								}
-
-								// Cancel if not aligned in target price and quantity
-								qs := big.NewFloat(tradeQuantity).SetMode(big.AwayFromZero).Text('f', 7)
-								qr := big.NewFloat(c.RemainingQuantity).SetMode(big.AwayFromZero).Text('f', 7)
-								tp := big.NewFloat(tradePrice).SetMode(big.AwayFromZero).Text('f', 7)
-								tc := big.NewFloat(c.Price).SetMode(big.AwayFromZero).Text('f', 7)
-
-								log.Print("-- ", qs)
-								log.Print("-- ", qr)
-								log.Print("-- ", tp)
-								log.Print("-- ", tc)
-								if qr != qs || tc != tp {
-									remarks := bot.accountOne.APIKey
-
-									c, err := cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
-										currencyPair, placedOrder)
-
-									if err != nil {
-										log.Print("error occurred in cancelling order")
-										remarks = fmt.Sprintf("Error on %s", bot.accountOne.APIKey)
-									}
-
-									if !c.Success {
-										log.Print("unable to cancel order")
-									}
-
-									// Record cancel order
-									insertTransaction("CANCEL", "nox_eth", tradePrice, tradeQuantity,
-										strconv.FormatBool(bot.simulate), remarks)
-									placedOrder = -1
-
-									// Repeat
-									goto repeatCheckLowestBid
-								}
-							}
-
-							// Check if the lowest is the trade price and check
-							if lowest >= tradePrice && tradePrice > 0 && placedOrder > 0 {
-								remarks := bot.accountTwo.APIKey
-
-								if !bot.simulate {
-									_, err := buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
-										currencyPair, tradePrice, tradeQuantity)
-									if err != nil {
-										log.Print("error occurred in creating buy order ", err)
-										remarks = fmt.Sprintf("Error on %s", bot.accountTwo.APIKey)
-									}
-								}
-
-								// Record buy transaction
-								insertTransaction("BUY", "nox_eth", tradePrice, tradeQuantity,
-									strconv.FormatBool(bot.simulate), remarks)
-
-								// Put a trade place flag and removed placed order ID.
-								tradePlace = true
-								placedOrder = -1
-							}
-						}
-					}
-
-					// Check if rule two and three is enabled and if there is already been
-					// a trade place then skip.
-					if bot.ruleTwo.Enabled && bot.ruleThree.Enabled && !tradePlace {
-
-						// Update the price to get the latest update
-						p := updateTicker(currencyPair)
-						lowest := p["ask"].(float64)
-						volume := p["volume"].(float64)
-
-						// Calculate the trade price and the amount to be trade
-						v := bot.ruleTwo.TransactionVolume * (bot.ruleTwo.VarianceOfTransaction / 100.0)
-						quantity := bot.ruleTwo.TransactionVolume + getRandom(v)
-						targetPrice := lowest - bot.ruleTwo.BidPriceStepDown
-
-						// Log for easy debugging
-						log.Printf("--- %.8f %0.8f", lowest, volume)
-						log.Printf("--- %.8f %0.8f = %0.8f", targetPrice, quantity)
-
-						// Switch roles if the seller has no amount specified.
-						if err := switchAccountRolesSeller(quantity); err != nil {
-							log.Print(err)
-							return
-						}
-
-						// Check buyer if it can buy the specified amount.
-						if err := switchAccountRolesBuyer(targetPrice * quantity); err != nil {
-							log.Print(err)
-							return
-						}
-
-						// Check if target price aligns the minimumBid and if no order has
-						// been placed yet.
-						if targetPrice >= bot.ruleTwo.MinimumBid && placedOrder < 0 {
-
-							// Check if the bot volume generated is over the set maximum volume
-							// otherwise stop.
-							if botVolume < bot.ruleTwo.MaximumVolume {
-								botVolume += quantity
-
-								remarks := bot.accountOne.APIKey
-
-								// Check if its in simulation mode otherwise mock placed order.
-								if !bot.simulate {
-									o, err := sellLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
-										currencyPair, targetPrice, quantity)
-									if err != nil {
-										log.Print("error occurred in creating sell order")
-										remarks = fmt.Sprintf("Error on %s", bot.accountOne.APIKey)
-										placedOrder = -1
-									}
-									placedOrder = o.OrderID
-								} else {
-									placedOrder = 1
-								}
-
-								// Save trade price and quantity
-								tradePrice = targetPrice
-								tradeQuantity = quantity
-
-								// Record the sell transaction
-								insertTransaction("SELL", "nox_eth", tradePrice, tradeQuantity,
-									strconv.FormatBool(bot.simulate), remarks)
-							}
-
-							// Check if the lowest is not the trade price
 							if lowest != tradePrice && tradePrice > 0 && placedOrder > 0 {
 								remarks := bot.accountOne.APIKey
 
@@ -414,13 +238,10 @@ func pollTicker() {
 								}
 							}
 
-							// Check if the lowest price comes from accounte one then
-							// execute trade
+							// Check if the lowest is the trade price and check
 							if lowest >= tradePrice && tradePrice > 0 && placedOrder > 0 {
-
 								remarks := bot.accountTwo.APIKey
 
-								// Check if bot is in simulation mode
 								if !bot.simulate {
 									_, err := buyLimit(bot.accountTwo.APIKey, bot.accountTwo.APISecret,
 										currencyPair, tradePrice, tradeQuantity)
@@ -430,12 +251,11 @@ func pollTicker() {
 									}
 								}
 
-								// Record transaction
+								// Record buy transaction
 								insertTransaction("BUY", "nox_eth", tradePrice, tradeQuantity,
 									strconv.FormatBool(bot.simulate), remarks)
 
 								// Put a trade place flag and removed placed order ID.
-								tradePlace = true
 								placedOrder = -1
 							}
 						}
@@ -445,9 +265,20 @@ func pollTicker() {
 		}()
 
 		waitExchanges.Wait()
-		interval := time.Duration(bot.ruleOne.Interval)
+
+		t := randomInterval(
+			bot.ruleOne.MinInterval.Nanoseconds(),
+			bot.ruleOne.MaxInterval.Nanoseconds())
+		log.Print("-- interval ", t)
+
+		interval := time.Duration(t)
 		time.Sleep(interval)
 	}
+}
+
+func randomInterval(min, max int64) int64 {
+	rand.Seed(time.Now().Unix())
+	return rand.Int63n(max-min) + min
 }
 
 func switchAccountRolesSeller(quantity float64) (err error) {

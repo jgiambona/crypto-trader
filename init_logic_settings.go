@@ -21,7 +21,8 @@ type (
 
 	RuleConfiguration struct {
 		ID                    int64
-		Interval              time.Duration
+		MinInterval           time.Duration
+		MaxInterval           time.Duration
 		MaximumVolume         float64
 		TransactionVolume     float64
 		VarianceOfTransaction float64
@@ -84,9 +85,43 @@ func updateSettings(c echo.Context) error {
 	stepDownPrice, _ := strconv.ParseFloat(c.FormValue("stepDownPrice"), 64)
 	minimumBid, _ := strconv.ParseFloat(c.FormValue("minimumBid"), 64)
 
-	intervalRune := []rune(c.FormValue("interval"))
-	log.Print(c.FormValue("interval"))
+	minIntervalRune := []rune(c.FormValue("minInterval"))
+	log.Print(c.FormValue("minInterval"))
 
+	maxIntervalRune := []rune(c.FormValue("maxInterval"))
+	log.Print(c.FormValue("maxInterval"))
+
+	if id == 1 {
+		bot.ruleOne.Enabled = true
+		bot.ruleOne.MinInterval = convertInterval(minIntervalRune)
+		bot.ruleOne.MaxInterval = convertInterval(maxIntervalRune)
+		bot.ruleOne.MaximumVolume = maximumVolume
+		bot.ruleOne.TransactionVolume = transactionVolume
+		bot.ruleOne.VarianceOfTransaction = variance
+		bot.ruleOne.BidPriceStepDown = stepDownPrice
+		bot.ruleOne.MinimumBid = minimumBid
+	} else {
+		return jsonBadRequest(c, "error no such account.")
+	}
+
+	log.Printf(`
+	----- One
+	--- %.8f
+	--- %.8f
+	--- %.8f
+	--- %.8f
+	--- %.8f
+	----- End`,
+		bot.ruleOne.MaximumVolume, bot.ruleOne.TransactionVolume,
+		bot.ruleOne.VarianceOfTransaction, bot.ruleOne.BidPriceStepDown,
+		bot.ruleOne.MinimumBid)
+
+	return jsonSuccess(c, echo.Map{
+		"account": id,
+	})
+}
+
+func convertInterval(intervalRune []rune) time.Duration {
 	in, _ := strconv.ParseInt(string(intervalRune[0:len(intervalRune)-1]), 10, 64)
 	interval := time.Duration(in)
 	switch intervalRune[len(intervalRune)-1] {
@@ -101,54 +136,9 @@ func updateSettings(c echo.Context) error {
 	default:
 		interval *= time.Second
 	}
+
 	log.Print(interval)
-
-	if id == 1 {
-		bot.ruleOne.Enabled = true
-		bot.ruleOne.Interval = interval
-		bot.ruleOne.MaximumVolume = maximumVolume
-		bot.ruleOne.TransactionVolume = transactionVolume
-		bot.ruleOne.VarianceOfTransaction = variance
-		bot.ruleOne.BidPriceStepDown = stepDownPrice
-		bot.ruleOne.MinimumBid = minimumBid
-	} else if id == 2 {
-		bot.ruleTwo.Enabled = true
-		bot.ruleTwo.Interval = interval
-		bot.ruleTwo.MaximumVolume = maximumVolume
-		bot.ruleTwo.TransactionVolume = transactionVolume
-		bot.ruleTwo.VarianceOfTransaction = variance
-		bot.ruleTwo.BidPriceStepDown = stepDownPrice
-		bot.ruleTwo.MinimumBid = minimumBid
-	} else {
-		return jsonBadRequest(c, "error no such account.")
-	}
-
-	log.Printf(`
-	----- One
-	--- %d
-	--- %.8f
-	--- %.8f
-	--- %.8f
-	--- %.8f
-	--- %.8f
-	----- Two
-	--- %d
-	--- %.8f
-	--- %.8f
-	--- %.8f
-	--- %.8f
-	--- %.8f
-	----- End`,
-		bot.ruleOne.Interval, bot.ruleOne.MaximumVolume, bot.ruleOne.TransactionVolume,
-		bot.ruleOne.VarianceOfTransaction, bot.ruleOne.BidPriceStepDown,
-		bot.ruleOne.MinimumBid,
-		bot.ruleTwo.Interval, bot.ruleTwo.MaximumVolume, bot.ruleTwo.TransactionVolume,
-		bot.ruleTwo.VarianceOfTransaction, bot.ruleTwo.BidPriceStepDown,
-		bot.ruleTwo.MinimumBid)
-
-	return jsonSuccess(c, echo.Map{
-		"account": id,
-	})
+	return interval
 }
 
 func botExported(c echo.Context) error {
