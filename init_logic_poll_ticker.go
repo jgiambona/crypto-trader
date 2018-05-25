@@ -124,7 +124,7 @@ func pollTicker() {
 									strconv.FormatBool(bot.simulate), remarks)
 							}
 
-							if lowest != tradePrice && tradePrice > 0 && placedOrder > 0 {
+							if lowest != tradePrice && placedOrder > 0 {
 								remarks := bot.accountOne.APIKey
 
 								// Check if bot is in simulation mode
@@ -152,7 +152,7 @@ func pollTicker() {
 								goto repeatCheckLowestBid
 							}
 
-							{
+							if placedOrder > 0 {
 								o, err := getOrderBook(currencyPair)
 								if err != nil {
 									log.Print(err)
