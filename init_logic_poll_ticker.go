@@ -124,7 +124,6 @@ func pollTicker() {
 									strconv.FormatBool(bot.simulate), remarks)
 							}
 
-
 							if placedOrder > 0 {
 								o, err := getOrderBook(currencyPair)
 								if err != nil {
@@ -175,49 +174,49 @@ func pollTicker() {
 								}
 							}
 
-							if !bot.simulate && placedOrder > 1 {
-								log.Print("-- ", placedOrder)
-								c, err := getOrder(bot.accountOne.APIKey, bot.accountOne.APISecret,
-									strconv.FormatInt(placedOrder, 10))
-								if err != nil {
-									log.Print("error occurred in cancelling order")
-								}
+							// if !bot.simulate && placedOrder > 1 {
+							// 	log.Print("-- ", placedOrder)
+							// 	c, err := getOrder(bot.accountOne.APIKey, bot.accountOne.APISecret,
+							// 		strconv.FormatInt(placedOrder, 10))
+							// 	if err != nil {
+							// 		log.Print("error occurred in cancelling order")
+							// 	}
 
-								// Cancel if not aligned in target price and quantity
-								qs := big.NewFloat(tradeQuantity).SetMode(big.AwayFromZero).Text('f', 7)
-								qr := big.NewFloat(c.RemainingQuantity).SetMode(big.AwayFromZero).Text('f', 7)
-								tp := big.NewFloat(tradePrice).SetMode(big.AwayFromZero).Text('f', 7)
-								tc := big.NewFloat(c.Price).SetMode(big.AwayFromZero).Text('f', 7)
+							// 	// Cancel if not aligned in target price and quantity
+							// 	qs := big.NewFloat(tradeQuantity).SetMode(big.AwayFromZero).Text('f', 7)
+							// 	qr := big.NewFloat(c.RemainingQuantity).SetMode(big.AwayFromZero).Text('f', 7)
+							// 	tp := big.NewFloat(tradePrice).SetMode(big.AwayFromZero).Text('f', 7)
+							// 	tc := big.NewFloat(c.Price).SetMode(big.AwayFromZero).Text('f', 7)
 
-								log.Print("-- ", qs)
-								log.Print("-- ", qr)
-								log.Print("-- ", tp)
-								log.Print("-- ", tc)
-								if qr != qs || tc != tp {
-									remarks := bot.accountOne.APIKey
+							// 	log.Print("-- ", qs)
+							// 	log.Print("-- ", qr)
+							// 	log.Print("-- ", tp)
+							// 	log.Print("-- ", tc)
+							// 	if qr != qs || tc != tp {
+							// 		remarks := bot.accountOne.APIKey
 
-									c, err := cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
-										currencyPair, placedOrder)
+							// 		c, err := cancelLimit(bot.accountOne.APIKey, bot.accountOne.APISecret,
+							// 			currencyPair, placedOrder)
 
-									if err != nil {
-										log.Print("error occurred in cancelling order")
-										remarks = fmt.Sprintf("Error on %s", bot.accountOne.APIKey)
-									}
+							// 		if err != nil {
+							// 			log.Print("error occurred in cancelling order")
+							// 			remarks = fmt.Sprintf("Error on %s", bot.accountOne.APIKey)
+							// 		}
 
-									if !c.Success {
-										log.Print("unable to cancel order")
-									}
+							// 		if !c.Success {
+							// 			log.Print("unable to cancel order")
+							// 		}
 
-									// Record cancel order
-									insertTransaction("CANCEL", "nox_eth", tradePrice, tradeQuantity,
-										strconv.FormatBool(bot.simulate), remarks)
-									placedOrder = -1
+							// 		// Record cancel order
+							// 		insertTransaction("CANCEL", "nox_eth", tradePrice, tradeQuantity,
+							// 			strconv.FormatBool(bot.simulate), remarks)
+							// 		placedOrder = -1
 
-									// Repeat
-									time.Sleep(time.Duration(bot.ruleOne.MinInterval.Nanoseconds()))
-									goto repeatCheckLowestBid
-								}
-							}
+							// 		// Repeat
+							// 		time.Sleep(time.Duration(bot.ruleOne.MinInterval.Nanoseconds()))
+							// 		goto repeatCheckLowestBid
+							// 	}
+							// }
 
 							// Check if the lowest is the trade price and check
 							if lowest >= tradePrice && tradePrice > 0 && placedOrder > 0 {
