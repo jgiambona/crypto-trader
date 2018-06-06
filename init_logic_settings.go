@@ -20,15 +20,17 @@ type (
 	}
 
 	RuleConfiguration struct {
-		ID                    int64
-		MinInterval           time.Duration
-		MaxInterval           time.Duration
-		MaximumVolume         float64
-		TransactionVolume     float64
-		VarianceOfTransaction float64
-		BidPriceStepDown      float64
-		MinimumBid            float64
-		Enabled               bool
+		ID                      int64
+		MinInterval             time.Duration
+		MaxInterval             time.Duration
+		CheckOrderDelay         time.Duration
+		MaximumVolume           float64
+		TransactionVolume       float64
+		VarianceOfTransaction   float64
+		BidPriceStepDown        float64
+		VarianceOfPriceStepDown float64
+		MinimumBid              float64
+		Enabled                 bool
 	}
 )
 
@@ -81,8 +83,10 @@ func updateSettings(c echo.Context) error {
 	id, _ := strconv.ParseInt(c.FormValue("id"), 10, 64)
 	maximumVolume, _ := strconv.ParseFloat(c.FormValue("maximumVolume"), 64)
 	transactionVolume, _ := strconv.ParseFloat(c.FormValue("transactionVolume"), 64)
-	variance, _ := strconv.ParseFloat(c.FormValue("variance"), 64)
+	varianceTransaction, _ := strconv.ParseFloat(c.FormValue("varianceTransaction"), 64)
 	stepDownPrice, _ := strconv.ParseFloat(c.FormValue("stepDownPrice"), 64)
+	varianceStepDown, _ := strconv.ParseFloat(c.FormValue("varianceStepDown"), 64)
+	floorPriceGap, _ := strconv.ParseFloat(c.FormValue("floorPriceGap"), 64)
 	minimumBid, _ := strconv.ParseFloat(c.FormValue("minimumBid"), 64)
 
 	minIntervalRune := []rune(c.FormValue("minInterval"))
@@ -91,13 +95,17 @@ func updateSettings(c echo.Context) error {
 	maxIntervalRune := []rune(c.FormValue("maxInterval"))
 	log.Print(c.FormValue("maxInterval"))
 
+	checkOrderDelay := []rune(c.FormValue("checkOrderDelay"))
+	log.Print(c.FormValue("checkOrderDelay"))
+
 	if id == 1 {
 		bot.ruleOne.Enabled = true
 		bot.ruleOne.MinInterval = convertInterval(minIntervalRune)
 		bot.ruleOne.MaxInterval = convertInterval(maxIntervalRune)
+		bot.ruleOne.CheckOrderDelay = convertInterval(checkOrderDelay)
 		bot.ruleOne.MaximumVolume = maximumVolume
 		bot.ruleOne.TransactionVolume = transactionVolume
-		bot.ruleOne.VarianceOfTransaction = variance
+		bot.ruleOne.VarianceOfTransaction = varianceTransaction
 		bot.ruleOne.BidPriceStepDown = stepDownPrice
 		bot.ruleOne.MinimumBid = minimumBid
 	} else {
