@@ -68,6 +68,7 @@ func pollTicker() {
 
 						// Update ticker to get price
 						p := updateTicker(currencyPair)
+						best := p["bid"].(float64)
 						lowest := p["ask"].(float64)
 						volume := p["volume"].(float64)
 
@@ -78,6 +79,11 @@ func pollTicker() {
 						step := randomFloat(bot.ruleOne.MinBidPriceStepDown, bot.ruleOne.MaxBidPriceStepDown)
 						log.Print("-- step down ", step)
 						targetPrice := lowest - step
+
+						if targetPrice < best+bot.ruleOne.FloorPriceGap {
+							time.Sleep(time.Duration(bot.ruleOne.MinInterval.Nanoseconds()))
+							goto repeatCheckLowestBid
+						}
 
 						log.Printf("--- lowest %.8f volume %0.8f", lowest, volume)
 						log.Printf("--- tp %.8f price %0.8f = amount %0.8f", targetPrice, quantity, targetPrice*quantity)
