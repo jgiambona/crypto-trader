@@ -53,11 +53,14 @@ func main() {
 	bot.ruleOne.Enabled = true
 	bot.ruleOne.MinInterval = time.Duration(7 * time.Second)
 	bot.ruleOne.MaxInterval = time.Duration(10 * time.Second)
-	bot.ruleOne.MaximumVolume = 50000.0
+	bot.ruleOne.CheckOrderDelay = time.Duration(1 * time.Second)
+	bot.ruleOne.MaximumVolume = 500000.0
 	bot.ruleOne.TransactionVolume = 300.0
 	bot.ruleOne.VarianceOfTransaction = 10.0
-	bot.ruleOne.BidPriceStepDown = 0.00000001
-	bot.ruleOne.MinimumBid = 0.00001
+	bot.ruleOne.MinBidPriceStepDown = 0.00000001
+	bot.ruleOne.MaxBidPriceStepDown = 0.00000010
+	bot.ruleOne.FloorPriceGap = 0.00020000
+	bot.ruleOne.MinimumBid = 0.00011500
 
 	loadRoutes(e)
 

@@ -74,10 +74,13 @@ func pollTicker() {
 						// Calculate the target price and quantity to trade
 						v := bot.ruleOne.TransactionVolume * (bot.ruleOne.VarianceOfTransaction / 100.0)
 						quantity := bot.ruleOne.TransactionVolume + getRandom(v)
-						targetPrice := lowest - bot.ruleOne.BidPriceStepDown
 
-						log.Printf("--- %.8f %0.8f", lowest, volume)
-						log.Printf("--- %.8f %0.8f = %0.8f", targetPrice, quantity, targetPrice*quantity)
+						step := randomFloat(bot.ruleOne.MinBidPriceStepDown, bot.ruleOne.MaxBidPriceStepDown)
+						log.Print("-- step down ", step)
+						targetPrice := lowest - step
+
+						log.Printf("--- lowest %.8f volume %0.8f", lowest, volume)
+						log.Printf("--- tp %.8f price %0.8f = amount %0.8f", targetPrice, quantity, targetPrice*quantity)
 
 						// Switch seller roles if quantity is lower than can be traded.
 						if err := switchAccountRolesSeller(quantity); err != nil {
@@ -125,6 +128,8 @@ func pollTicker() {
 							}
 
 							if placedOrder > 0 {
+								time.Sleep(time.Duration(bot.ruleOne.CheckOrderDelay.Nanoseconds()))
+
 								o, err := getOrderBook(currencyPair)
 								if err != nil {
 									log.Print(err)
@@ -145,6 +150,7 @@ func pollTicker() {
 								if len(tp) > len(tc) {
 									tp = big.NewFloat(tradePrice).SetMode(big.AwayFromZero).Text('f', 8)[0:tcl]
 								}
+
 								log.Print("-- ", tp)
 								log.Print("-- ", tc)
 
@@ -259,6 +265,12 @@ func pollTicker() {
 func randomInterval(min, max int64) int64 {
 	rand.Seed(time.Now().Unix())
 	return rand.Int63n(max-min) + min
+}
+
+func randomFloat(min, max float64) float64 {
+	rand.Seed(time.Now().Unix())
+	r := min + rand.Float64()*(max-min)
+	return r
 }
 
 func switchAccountRolesSeller(quantity float64) (err error) {

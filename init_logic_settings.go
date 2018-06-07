@@ -20,17 +20,18 @@ type (
 	}
 
 	RuleConfiguration struct {
-		ID                      int64
-		MinInterval             time.Duration
-		MaxInterval             time.Duration
-		CheckOrderDelay         time.Duration
-		MaximumVolume           float64
-		TransactionVolume       float64
-		VarianceOfTransaction   float64
-		BidPriceStepDown        float64
-		VarianceOfPriceStepDown float64
-		MinimumBid              float64
-		Enabled                 bool
+		ID                    int64
+		MinInterval           time.Duration
+		MaxInterval           time.Duration
+		CheckOrderDelay       time.Duration
+		MaximumVolume         float64
+		TransactionVolume     float64
+		VarianceOfTransaction float64
+		MinBidPriceStepDown   float64
+		MaxBidPriceStepDown   float64
+		FloorPriceGap         float64
+		MinimumBid            float64
+		Enabled               bool
 	}
 )
 
@@ -84,8 +85,8 @@ func updateSettings(c echo.Context) error {
 	maximumVolume, _ := strconv.ParseFloat(c.FormValue("maximumVolume"), 64)
 	transactionVolume, _ := strconv.ParseFloat(c.FormValue("transactionVolume"), 64)
 	varianceTransaction, _ := strconv.ParseFloat(c.FormValue("varianceTransaction"), 64)
-	stepDownPrice, _ := strconv.ParseFloat(c.FormValue("stepDownPrice"), 64)
-	varianceStepDown, _ := strconv.ParseFloat(c.FormValue("varianceStepDown"), 64)
+	minStepDownPrice, _ := strconv.ParseFloat(c.FormValue("minStepDownPrice"), 64)
+	maxStepDownPrice, _ := strconv.ParseFloat(c.FormValue("maxStepDownPrice"), 64)
 	floorPriceGap, _ := strconv.ParseFloat(c.FormValue("floorPriceGap"), 64)
 	minimumBid, _ := strconv.ParseFloat(c.FormValue("minimumBid"), 64)
 
@@ -106,7 +107,9 @@ func updateSettings(c echo.Context) error {
 		bot.ruleOne.MaximumVolume = maximumVolume
 		bot.ruleOne.TransactionVolume = transactionVolume
 		bot.ruleOne.VarianceOfTransaction = varianceTransaction
-		bot.ruleOne.BidPriceStepDown = stepDownPrice
+		bot.ruleOne.MinBidPriceStepDown = minStepDownPrice
+		bot.ruleOne.MaxBidPriceStepDown = maxStepDownPrice
+		bot.ruleOne.FloorPriceGap = floorPriceGap
 		bot.ruleOne.MinimumBid = minimumBid
 	} else {
 		return jsonBadRequest(c, "error no such account.")
@@ -119,9 +122,12 @@ func updateSettings(c echo.Context) error {
 	--- %.8f
 	--- %.8f
 	--- %.8f
+	--- %.8f
+	--- %.8f
 	----- End`,
 		bot.ruleOne.MaximumVolume, bot.ruleOne.TransactionVolume,
-		bot.ruleOne.VarianceOfTransaction, bot.ruleOne.BidPriceStepDown,
+		bot.ruleOne.VarianceOfTransaction, bot.ruleOne.MinBidPriceStepDown,
+		bot.ruleOne.MaxBidPriceStepDown, bot.ruleOne.FloorPriceGap,
 		bot.ruleOne.MinimumBid)
 
 	return jsonSuccess(c, echo.Map{
